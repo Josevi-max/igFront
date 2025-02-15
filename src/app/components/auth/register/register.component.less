@@ -2,28 +2,35 @@
     border: 1px solid #FF3040 !important;
 
 }
-.form-floating > .form-control:not(:placeholder-shown) ~ label::after {
+
+.form-floating>.form-control:not(:placeholder-shown)~label::after {
     background: none;
 }
-.form-floating > .form-control:focus ~ label::after{
+
+.form-floating>.form-control:focus~label::after {
     transform: scale(.65) translateY(-.5rem) translateX(.15rem);
     background: none;
 
 }
-.form-floating > .form-control:focus ~ label {
+
+.form-floating>.form-control:focus~label {
     background: none;
 
 }
-.form-control:focus ~ label {
+
+.form-control:focus~label {
     color: #a8a8a8
 }
-.form-control ~ label {
+
+.form-control~label {
     color: #a8a8a8
 }
-.form-floating > label {
+
+.form-floating>label {
     top: -7px;
     padding-left: 10px;
 }
+
 .errorIcon,
 .errorIconPassword {
     position: relative;
@@ -43,21 +50,25 @@
     right: 70px;
 }
 
-.validIconPassword::after,.validIcon::after {
+.validIconPassword::after,
+.validIcon::after {
     content: "\f058";
-    color: rgb(85,85,85);
+    color: rgb(85, 85, 85);
     font-size: 20px;
     font-family: "Font Awesome 6 Free";
     position: absolute;
     top: 3px;
-    
+
 }
+
 .validIconPassword::after {
     right: 70px;
 }
+
 .validIcon::after {
     right: 20px;
 }
+
 .containerRegister {
     max-width: 350px;
     border: 1px solid #363636;
@@ -83,6 +94,7 @@
         top: 0;
         right: 2px;
         border: none;
+
         &:active {
             border: none;
         }
@@ -122,7 +134,7 @@
         min-height: 0;
         padding-bottom: 0;
     }
-    
+
     input::placeholder {
         color: #a8a8a8;
     }

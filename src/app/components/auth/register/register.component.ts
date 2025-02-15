@@ -3,15 +3,19 @@ import { Router, RouterModule } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth/auth.service';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
+import { SpinnerComponent } from '../../../shared/spinner/spinner.component';
+
 @Component({
   selector: 'app-register',
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    SpinnerComponent
   ],
+  
   templateUrl: './register.component.html',
   styleUrl: './register.component.less'
 })
@@ -38,6 +42,7 @@ export class RegisterComponent {
       ]
     ),
   });
+  loading = false;
   constructor(private router: Router, private _authService: AuthService, private toastr: ToastrService) {
 
   }
@@ -46,15 +51,17 @@ export class RegisterComponent {
 
   registerUser() {
     if (this.registerForm.valid) {
+      this.loading = true;
       this._authService.register(this.registerForm.value).subscribe(
         (response) => {
-          // Manejar la respuesta exitosa
           this.toastr.success('¡Usuario registrado, redirigiendo al login!', 'Éxito');
           this.router.navigate(['auth/login']);
+          this.loading = false;
         },
         (error) => {
           console.log(error);
-          this.toastr.error('Error al registrar al usuario: ', 'Error');
+          this.toastr.error(error.error, 'Error');
+          this.loading = false;
         }
       );
     }

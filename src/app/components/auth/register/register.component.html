@@ -1,3 +1,4 @@
+<div [ngClass]="{'d-none':loading}">
     <div class="container px-4 pt-5  text-center  mt-5 containerRegister">
         <div class="row  align-items-center">
             <div class=" mb-3 " style="z-index: 10">
@@ -22,12 +23,13 @@
                     <div class="row">
                         <!-- Email input -->
                         <div class="form-outline mb-2">
-                            <div [ngClass]="{'errorIcon' : emailInvalid, 'validIcon': !emailInvalid && registerForm.get('email')?.touched}" class="position-relative form-floating">
+                            <div [ngClass]="{'errorIcon' : emailInvalid, 'validIcon': !emailInvalid && registerForm.get('email')?.touched}"
+                                class="position-relative form-floating">
                                 <input type="email" placeholder="" id="emailInput" name="email" formControlName="email"
-                                class="form-control" [ngClass]="{'error' : emailInvalid}" />
+                                    class="form-control" [ngClass]="{'error' : emailInvalid}" />
                                 <label for="emailInput">Correo electrónico</label>
                             </div>
-                            
+
                             <p class="text-danger text-start ps-2 pt-1"
                                 *ngIf="registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched">
                                 Email requerido
@@ -39,13 +41,16 @@
                         </div>
                         <!-- Password input -->
                         <div class="form-outline mb-2">
-                            <div [ngClass]="{'errorIconPassword' : passwordInvalid, 'validIconPassword': !passwordInvalid && registerForm.get('password')?.touched}" class="position-relative form-floating">
-                                <input type="password" id="passwordInput" placeholder="" name="password" formControlName="password"
-                                class="form-control" [ngClass]="{'error' : passwordInvalid}" />
+                            <div [ngClass]="{'errorIconPassword' : passwordInvalid, 'validIconPassword': !passwordInvalid && registerForm.get('password')?.touched}"
+                                class="position-relative form-floating">
+                                <input type="password" id="passwordInput" placeholder="" name="password"
+                                    formControlName="password" class="form-control"
+                                    [ngClass]="{'error' : passwordInvalid}" />
                                 <label for="passwordInput">Contraseña</label>
-                                <span class="btn" (click)="showPassword()" [ngClass]="{'showPassword' : registerForm.get('password')?.dirty, 'd-none': !registerForm.get('password')?.dirty }">Mostrar</span>
+                                <span class="btn" (click)="showPassword()"
+                                    [ngClass]="{'showPassword' : registerForm.get('password')?.dirty, 'd-none': !registerForm.get('password')?.dirty }">Mostrar</span>
                             </div>
-                            
+
                             <p class="text-start text-danger ps-2 pt-1"
                                 *ngIf="registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched">
                                 Contraseña requerida
@@ -55,14 +60,15 @@
                                 La contraseña debe de tener al menos 6 caracteres
                             </p>
                         </div>
-    
+
                         <div class="form-outline mb-2">
-                            <div [ngClass]="{'errorIcon' : nameInvalid, 'validIcon': !nameInvalid && registerForm.get('name')?.touched}" class="position-relative form-floating">
+                            <div [ngClass]="{'errorIcon' : nameInvalid, 'validIcon': !nameInvalid && registerForm.get('name')?.touched}"
+                                class="position-relative form-floating">
                                 <input type="text" id="nameInput" placeholder="" name="name" formControlName="name"
-                                class="form-control" [ngClass]="{'error' : nameInvalid}" />
+                                    class="form-control" [ngClass]="{'error' : nameInvalid}" />
                                 <label for="nameInput">Nombre completo</label>
                             </div>
-                            
+
                             <p class="text-start text-danger ps-2 pt-1"
                                 *ngIf="registerForm.get('name')?.hasError('required') && registerForm.get('name')?.touched">
                                 Nombre requerido
@@ -73,12 +79,14 @@
                             </p>
                         </div>
                         <div class="form-outline mb-1">
-                            <div [ngClass]="{'errorIcon' : usernameInvalid, 'validIcon': !usernameInvalid && registerForm.get('username')?.touched}" class="position-relative form-floating">
-                                <input type="text" id="usernameInput" placeholder="" name="username" formControlName="username" class="form-control"
-                                [ngClass]="{'error' : usernameInvalid}" />
+                            <div [ngClass]="{'errorIcon' : usernameInvalid, 'validIcon': !usernameInvalid && registerForm.get('username')?.touched}"
+                                class="position-relative form-floating">
+                                <input type="text" id="usernameInput" placeholder="" name="username"
+                                    formControlName="username" class="form-control"
+                                    [ngClass]="{'error' : usernameInvalid}" />
                                 <label for="usernameInput">Nombre de usuario</label>
                             </div>
-                            
+
                             <p class="text-start text-danger ps-2 pt-1"
                                 *ngIf="registerForm.get('username')?.hasError('required') && registerForm.get('username')?.touched">
                                 Nombre de usuario requerido
@@ -91,25 +99,38 @@
                     </div>
                     <div class="polites">
                         <p>
-                            Es posible que los usuarios de nuestro servicio hayan subido tu información de contacto en Instagram. <a href="https://www.facebook.com/help/instagram/261704639352628?next=%2F" target="_blank" class="moreInfo">Más información</a> 
+                            Es posible que los usuarios de nuestro servicio hayan subido tu información de contacto en
+                            Instagram. <a href="https://www.facebook.com/help/instagram/261704639352628?next=%2F"
+                                target="_blank" class="moreInfo">Más información</a>
                         </p>
                         <p>
-                            Al registrarte, aceptas nuestras <a target="_blank" href="https://help.instagram.com/581066165581870/?locale=es_ES&next=%2F">Condiciones</a> . Obtén más información en la <a href="https://www.facebook.com/privacy/policy?next=%2F" target="_blank">Política de privacidad</a>  sobre cómo recogemos, usamos y compartimos tus datos, así como sobre el uso que hacemos de las cookies y tecnologías similares en la <a target="_blank" href="https://privacycenter.instagram.com/policies/cookies/">Política de cookies</a> .
+                            Al registrarte, aceptas nuestras <a target="_blank"
+                                href="https://help.instagram.com/581066165581870/?locale=es_ES&next=%2F">Condiciones</a>
+                            .
+                            Obtén más información en la <a href="https://www.facebook.com/privacy/policy?next=%2F"
+                                target="_blank">Política de privacidad</a> sobre cómo recogemos, usamos y compartimos
+                            tus
+                            datos, así como sobre el uso que hacemos de las cookies y tecnologías similares en la <a
+                                target="_blank" href="https://privacycenter.instagram.com/policies/cookies/">Política de
+                                cookies</a> .
                         </p>
                     </div>
-                    
-                    <button type="submit" class="btn btn-primary">
+
+                    <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">
                         Registrate
                     </button>
-    
+
                     <p class="mt-5">
-                        También puedes <a href="https://help.instagram.com/contact/406206379945942/?locale=es_ES&Defamation_CF_redirect=%7B%22URLs1%22%3A%22https%3A%2F%2Fwww.instagram.com%2F%22%2C%22gb_country%22%3A%22Espa%25C3%25B1a%22%7D&Erasure_Redirect=%7B%22erasure_cf_redirect%22%3A%22%7B%5C%22Jurisdiction%5C%22%3A%5C%22Espa%25C3%25B1a%5C%22%2C%5C%22URLs%5C%22%3A%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%22%7D%22%2C%22ipr_cf_redirect%22%3A%22%7B%5C%22content_url%5C%22%3A%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%22%2C%5C%22crtformredirect%5C%22%3A%5C%22%7B%5C%5C%5C%22content_url%5C%5C%5C%22%3A%5C%5C%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%5C%5C%22%2C%5C%5C%5C%22crtformredirect%5C%5C%5C%22%3A%5C%5C%5C%22%7B%5C%5C%5C%5C%5C%5C%5C%22content_url%5C%5C%5C%5C%5C%5C%5C%22%3A%5C%5C%5C%5C%5C%5C%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%5C%5C%5C%5C%5C%5C%22%2C%5C%5C%5C%5C%5C%5C%5C%22whatcountry%5C%5C%5C%5C%5C%5C%5C%22%3A%5C%5C%5C%5C%5C%5C%5C%22Espa%25C3%25B1a%5C%5C%5C%5C%5C%5C%5C%22%7D%5C%5C%5C%22%2C%5C%5C%5C%22whatcountry%5C%5C%5C%22%3A%5C%5C%5C%22Espa%25C3%25B1a%5C%5C%5C%22%7D%5C%22%7D%22%7D&French_IG_LRRP_redirect=%7B%22URLs1%22%3A%22https%3A%2F%2Fwww.instagram.com%2F%22%7D&IP_CF_redirect=%7B%22submit_copyright_report%22%3A%22%7B%5C%22content_urls%5C%22%3A%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%22%7D%22%2C%22submit_tm_report%22%3A%22%7B%5C%22content_urls%5C%22%3A%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%22%2C%5C%22counterfeitredirect%5C%22%3A%5C%22%7B%5C%5C%5C%22content_urls%5C%5C%5C%22%3A%5C%5C%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%5C%5C%22%7D%5C%22%7D%22%7D&LOBComment3=https%3A%2F%2Fwww.instagram.com%2F&URLs1=https%3A%2F%2Fwww.instagram.com%2F&gb_country=Espa%25C3%25B1a" target="_blank">denunciar el contenido que creas que es ilegal</a>  en tu país sin iniciar sesión.
+                        También puedes <a
+                            href="https://help.instagram.com/contact/406206379945942/?locale=es_ES&Defamation_CF_redirect=%7B%22URLs1%22%3A%22https%3A%2F%2Fwww.instagram.com%2F%22%2C%22gb_country%22%3A%22Espa%25C3%25B1a%22%7D&Erasure_Redirect=%7B%22erasure_cf_redirect%22%3A%22%7B%5C%22Jurisdiction%5C%22%3A%5C%22Espa%25C3%25B1a%5C%22%2C%5C%22URLs%5C%22%3A%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%22%7D%22%2C%22ipr_cf_redirect%22%3A%22%7B%5C%22content_url%5C%22%3A%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%22%2C%5C%22crtformredirect%5C%22%3A%5C%22%7B%5C%5C%5C%22content_url%5C%5C%5C%22%3A%5C%5C%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%5C%5C%22%2C%5C%5C%5C%22crtformredirect%5C%5C%5C%22%3A%5C%5C%5C%22%7B%5C%5C%5C%5C%5C%5C%5C%22content_url%5C%5C%5C%5C%5C%5C%5C%22%3A%5C%5C%5C%5C%5C%5C%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%5C%5C%5C%5C%5C%5C%22%2C%5C%5C%5C%5C%5C%5C%5C%22whatcountry%5C%5C%5C%5C%5C%5C%5C%22%3A%5C%5C%5C%5C%5C%5C%5C%22Espa%25C3%25B1a%5C%5C%5C%5C%5C%5C%5C%22%7D%5C%5C%5C%22%2C%5C%5C%5C%22whatcountry%5C%5C%5C%22%3A%5C%5C%5C%22Espa%25C3%25B1a%5C%5C%5C%22%7D%5C%22%7D%22%7D&French_IG_LRRP_redirect=%7B%22URLs1%22%3A%22https%3A%2F%2Fwww.instagram.com%2F%22%7D&IP_CF_redirect=%7B%22submit_copyright_report%22%3A%22%7B%5C%22content_urls%5C%22%3A%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%22%7D%22%2C%22submit_tm_report%22%3A%22%7B%5C%22content_urls%5C%22%3A%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%22%2C%5C%22counterfeitredirect%5C%22%3A%5C%22%7B%5C%5C%5C%22content_urls%5C%5C%5C%22%3A%5C%5C%5C%22https%3A%2F%2Fwww.instagram.com%2F%5C%5C%5C%22%7D%5C%22%7D%22%7D&LOBComment3=https%3A%2F%2Fwww.instagram.com%2F&URLs1=https%3A%2F%2Fwww.instagram.com%2F&gb_country=Espa%25C3%25B1a"
+                            target="_blank">denunciar el contenido que creas que es ilegal</a> en tu país sin iniciar
+                        sesión.
                     </p>
                 </form>
             </div>
-            
+
         </div>
-        
+
     </div>
     <div class="container px-4 pt-3 pb-3  text-center  my-2 containerLoginRedirection">
         <p class="mb-0 mt-2">¿Tienes una cuenta?</p>
@@ -118,11 +139,18 @@
     <div class="container mt-3 px-4 text-center containerDownloadApk">
         <p>Descarga la aplicación.</p>
         <div class="linkApks">
-            <a href="https://play.google.com/store/apps/details?id=com.instagram.android&referrer=ig_mid%3D07322E3E-C62C-4434-AEE4-46B52F3FDC8C%26utm_campaign%3DsignupPage%26utm_content%3Dlo%26utm_source%3Dinstagramweb%26utm_medium%3Dbadge">
-                <img alt="Descargar de Google Play" class="x1vqgdyp" src="https://static.cdninstagram.com/rsrc.php/v4/yd/r/xOhODS7viZl.png">
+            <a
+                href="https://play.google.com/store/apps/details?id=com.instagram.android&referrer=ig_mid%3D07322E3E-C62C-4434-AEE4-46B52F3FDC8C%26utm_campaign%3DsignupPage%26utm_content%3Dlo%26utm_source%3Dinstagramweb%26utm_medium%3Dbadge">
+                <img alt="Descargar de Google Play" class="x1vqgdyp"
+                    src="https://static.cdninstagram.com/rsrc.php/v4/yd/r/xOhODS7viZl.png">
             </a>
-            <a href="ms-windows-store://pdp/?productid=9nblggh5l9xt&referrer=appbadge&source=www.instagram.com&mode=mini&pos=0%2C0%2C2560%2C1368">
-                <img alt="Descargar desde Microsoft" class="x1vqgdyp" src="https://static.cdninstagram.com/rsrc.php/v4/y9/r/LjIQEL8csb0.png">
+            <a
+                href="ms-windows-store://pdp/?productid=9nblggh5l9xt&referrer=appbadge&source=www.instagram.com&mode=mini&pos=0%2C0%2C2560%2C1368">
+                <img alt="Descargar desde Microsoft" class="x1vqgdyp"
+                    src="https://static.cdninstagram.com/rsrc.php/v4/y9/r/LjIQEL8csb0.png">
             </a>
         </div>
     </div>
+</div>
+
+<app-spinner *ngIf="loading"></app-spinner>
