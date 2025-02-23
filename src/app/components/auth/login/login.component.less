@@ -1,0 +1,199 @@
+.error {
+    border: 1px solid #FF3040 !important;
+
+}
+
+.form-floating>.form-control:not(:placeholder-shown)~label::after {
+    background: none;
+}
+
+.form-floating>.form-control:focus~label::after {
+    transform: scale(.65) translateY(-.5rem) translateX(.15rem);
+    background: none;
+
+}
+
+.form-floating>.form-control:focus~label {
+    background: none;
+
+}
+
+.form-control:focus~label {
+    color: #a8a8a8
+}
+
+.form-control~label {
+    color: #a8a8a8
+}
+
+.form-floating>label {
+    top: -7px;
+    padding-left: 10px;
+}
+
+.errorIcon,
+.errorIconPassword {
+    position: relative;
+
+    &::after {
+        content: "\f057";
+        color: #FF3040;
+        font-size: 20px;
+        font-family: "Font Awesome 6 Free";
+        position: absolute;
+        top: 3px;
+        right: 10px;
+    }
+}
+
+.errorIconPassword::after {
+    right: 70px;
+}
+
+.validIconPassword::after,
+.validIcon::after {
+    content: "\f058";
+    color: rgb(85, 85, 85);
+    font-size: 20px;
+    font-family: "Font Awesome 6 Free";
+    position: absolute;
+    top: 3px;
+
+}
+
+.validIconPassword::after {
+    right: 70px;
+}
+
+.validIcon::after {
+    right: 20px;
+}
+
+.containerRegister {
+    max-width: 350px;
+    border: 1px solid #363636;
+    color: #a8a8a8;
+    font-size: 12px;
+
+    button {
+        background-color: #0095f6;
+        font-size: 14px;
+        font-weight: 500;
+        width: 100%;
+        padding: 7px 16px;
+    }
+
+    .text-danger {
+        margin-bottom: 0;
+    }
+
+    .showPassword {
+        color: #FAFAFA;
+        font-size: 14px;
+        position: absolute;
+        top: 0;
+        right: 2px;
+        border: none;
+
+        &:active {
+            border: none;
+        }
+    }
+
+
+    .facebookLogin {
+        font-size: 14px;
+        color: #0095f6;
+        .fa-facebook::before{
+            font-size: 20px;
+        }
+    }
+    .forgotPassword {
+        font-size: 14px;
+    }
+
+    .otherPolites {
+        font-size: 12px;
+        padding: 16px 12px;
+    }
+
+    .line {
+        flex: 1;
+        height: 1px;
+        background-color: #262626;
+    }
+
+    .separator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .textSeparator {
+        margin: 0 5px;
+        padding-top: 2px;
+    }
+
+    input {
+        font-size: 11px;
+        height: 36px;
+        background-color: #121212;
+        color: #fff;
+        border: 1px solid #333;
+        box-shadow: inset 1px 1px 0 #111, inset -1px -1px 0 #111;
+        padding: 10px;
+        width: 100%;
+        border-radius: 2px;
+        padding-right: 110px;
+        min-height: 0;
+        padding-bottom: 0;
+    }
+    input:-internal-autofill-selected {
+        background-color: #121212;
+    }
+
+    input::placeholder {
+        color: #a8a8a8;
+    }
+
+    a {
+        text-decoration: none;
+        color: #E0F1FF;
+        text-align: justify;
+    }
+
+    .polites {
+        padding: 15px;
+    }
+}
+
+.containerLoginRedirection {
+    max-width: 350px;
+    border: 1px solid #363636;
+    color: #F5F5F5;
+    font-size: 14px;
+
+    a {
+        color: #0095f6;
+    }
+}
+
+.containerDownloadApk {
+    font-size: 14px;
+    color: #F5F5F5;
+
+    .linkApks {
+        display: flex;
+        justify-content: center;
+
+        a {
+            margin-right: 10px;
+
+            img {
+                height: 40px;
+            }
+        }
+
+    }
+
+}

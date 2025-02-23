@@ -1,0 +1,186 @@
+.header {
+    width: 280px;
+    height: 100vh;
+    border-right: 1px solid rgb(38, 38, 38);
+    position: fixed;
+
+    .logo {
+        padding: 25px 12px 16px;
+        margin-bottom: 19px;
+
+        .logoDesktop {
+            display: block;
+        }
+
+        .logoMobile {
+            display: none;
+        }
+    }
+
+    .nav-pills {
+        .nav-item {
+            height: 48px;
+            margin: 4px 0;
+
+            svg,
+            .fa-solid {
+                margin-right: 16px;
+            }
+
+            .fa-solid {
+                font-size: 24px;
+                margin-right: 20px;
+            }
+        }
+
+        .nav-item:hover {
+            background-color: #1a1a1a;
+            border-radius: 5px;
+        }
+    }
+
+    @media(max-width: 1264px) {
+        width: 80px;
+
+        span {
+            display: none;
+        }
+
+        .hideTablet {
+            display: none;
+        }
+
+        .logo {
+            height: 92px;
+        }
+
+        .nav-pills {
+            .nav-item {
+                height: 64px;
+
+                .nav-link {
+                    display: flex;
+                    justify-content: center;
+
+                    svg,
+                    .fa-solid {
+                        margin-right: 0;
+                    }
+                }
+            }
+
+        }
+
+        .logo {
+            padding-left: 15px;
+
+            .logoDesktop {
+                display: none;
+            }
+
+            .logoMobile {
+                display: block;
+                margin: auto;
+            }
+        }
+    }
+
+    @media(max-height:720px) {
+        .hideSmallTablets {
+            display: none;
+        }
+    }
+
+    @media(max-width:768px) {
+        display: none !important;
+    }
+}
+
+.headerNotDesktop {
+    width: 80px;
+    height: 100vh;
+    border-right: 1px solid rgb(38, 38, 38);
+    position: fixed;
+
+
+    span {
+        display: none;
+    }
+
+    .hideTablet {
+        display: none;
+    }
+
+    .logo {
+        padding: 25px 12px 16px;
+        margin-bottom: 19px;
+        height: 92px;
+
+        .logoDesktop {
+            display: block;
+        }
+
+        .logoMobile {
+            display: none;
+        }
+    }
+
+    .nav-pills {
+        .nav-item {
+            height: 64px;
+
+            .nav-link {
+                display: flex;
+                justify-content: center;
+
+                svg,
+                .fa-solid {
+                    margin-right: 0;
+                    font-size: 24px;
+
+                }
+            }
+        }
+
+    }
+
+    .logo {
+        padding-left: 15px;
+
+        .logoDesktop {
+            display: none;
+        }
+
+        .logoMobile {
+            display: block;
+            margin: auto;
+        }
+    }
+    @media(max-width:768px) {
+        display: none !important;
+    }
+}
+
+.headerMobile {
+    background-color: black;
+    z-index: 99;
+    height: 48px;
+    border-top: 1px solid #262626;
+
+    ul {
+        align-items: center;
+        height: 100%;
+
+        .fa-solid {
+            font-size: 24px;
+        }
+
+        a {
+            padding: 0;
+        }
+    }
+
+    @media(min-width:767px) {
+        display: none !important;
+    }
+}

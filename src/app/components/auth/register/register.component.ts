@@ -54,7 +54,7 @@ export class RegisterComponent {
       this.loading = true;
       this._authService.register(this.registerForm.value).subscribe(
         (response) => {
-          this.toastr.success('¡Usuario registrado, redirigiendo al login!', 'Éxito');
+          this.toastr.info('¡Usuario registrado, redirigiendo al login!', 'Éxito');
           this.router.navigate(['auth/login']);
           this.loading = false;
         },
