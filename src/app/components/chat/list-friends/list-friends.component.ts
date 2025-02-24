@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-list-friends',
@@ -8,4 +9,9 @@ import { Component } from '@angular/core';
 })
 export class ListFriendsComponent {
 
+  constructor(public auth:AuthService){
+
+  }
+
+  
 }
