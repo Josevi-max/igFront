@@ -21,7 +21,7 @@
                 <textarea (input)="resizeTextArea($event)" id="commentModal{{cardData['id']}}"
                     class="text-white bg-transparent border-0 textAreaInput modalStyle" placeholder="Añade un comentario..."
                     aria-label="With textarea"></textarea>
-                <input type="submit" class="btn publish d-none" value="Publicar">
+                <input type="submit" class="btn publish isInModal" value="Publicar">
             </form>
         }@else {
             <form class="commentSection" id="formComment{{cardData['id']}}" (ngSubmit)="createComment($event,cardData['id'])" #myForm="ngForm">

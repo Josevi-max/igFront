@@ -24,7 +24,7 @@ export class HomeService {
 
     let diff = Date.now() - dateMs;
 
-    let diffDays = Math.ceil(diff / msDay);
+    let diffDays = Math.floor(diff / msDay);
 
     let result = diffDays + ' días';
 

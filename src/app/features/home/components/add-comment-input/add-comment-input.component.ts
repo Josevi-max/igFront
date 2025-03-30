@@ -109,11 +109,16 @@ export class AddCommentInputComponent implements OnChanges{
     debugger;
     if (textarea.value != '') {
       //textarea.style.width = '380px';
-      submitButton?.classList.remove('d-none')
+      submitButton?.classList.remove('d-none');
+      submitButton?.classList.remove('isInModal');
       textarea.style.height = textarea.scrollHeight + "px";
     } else {
       textarea.style.width = '100%';
-      submitButton?.classList.add('d-none');
+      if(this.isModalSection){
+        submitButton?.classList.add('isInModal');
+      }else{
+        submitButton?.classList.add('d-none');
+      }
       textarea.style.height = '25px';
     }
   }
