@@ -12,7 +12,7 @@ import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    SpinnerComponent
+    SpinnerComponent,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.less'

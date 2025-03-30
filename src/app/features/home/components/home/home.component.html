@@ -2,8 +2,8 @@
     <app-header></app-header>
 
     <div class="cardContainer  pt-4" (click)="hideAllEmoyiPickers($event)">
-        @if(data().length > 0){
-        <div *ngFor="let cardData of data() " class="w-100 d-flex justify-content-center">
+        @if(this.homeService.data().length > 0){
+        <div *ngFor="let cardData of this.homeService.data() " class="w-100 d-flex justify-content-center">
             <div class="card">
                 <div class="d-flex align-items-center dataUser">
                     <i class="fa-solid fa-circle-user"></i>
@@ -13,7 +13,7 @@
                             •
                         </div>
                         <div class="time">
-                            {{getNumberDays(cardData['created_at'])}}
+                            {{this.homeService.getNumberDays(cardData['created_at'])}}
                         </div>
                     </div>
                 </div>
@@ -71,30 +71,15 @@
                             (click)="showHidedText(cardData['id'],$event)">más</span>
                     </div>
                     <div class="myComments">
-                        <span class="" *ngIf="cardData['comments'].length > 0">Ver los {{cardData['comments'].length}}
+                        <span ngClass="cursor-pointer" data-bs-toggle="modal" [attr.data-bs-target]="'#commentSection'+ cardData['id']" class=""
+                            *ngIf="cardData['comments'].length > 0">Ver los {{cardData['comments'].length}}
                             comentarios</span>
                         <p class="text-white" *ngFor="let comment of myComments(cardData['comments'])">
                             <span class="fw-bold">{{this.authService.userData().username}}</span> {{comment}}
                         </p>
                     </div>
-                    <emoji-picker class="emoyiPicker d-none" id="emoyiPicker{{cardData['id']}}"
-                        (emoji-click)="addEmoji(cardData['id'],$event)"></emoji-picker>
                     <div class="position-relative">
-                        <form class="commentSection" id="formComment{{cardData['id']}}"
-                            (ngSubmit)="createComment(cardData['id'])">
-                            <textarea (input)="resizeTextArea($event)" id="comment{{cardData['id']}}"
-                                class="text-white bg-transparent border-0 textAreaInput"
-                                placeholder="Añade un comentario..." aria-label="With textarea"></textarea>
-                            <input type="submit" class="btn publish d-none" value="Publicar">
-                            <svg (click)="showEmojiClicker(cardData['id'])" aria-label="Emoji" class="buttonToShowEmoyi"
-                                fill="currentColor" height="13" role="img" viewBox="0 0 24 24" width="13">
-                                <title>Emoji</title>
-                                <path
-                                    d="M15.83 10.997a1.167 1.167 0 1 0 1.167 1.167 1.167 1.167 0 0 0-1.167-1.167Zm-6.5 1.167a1.167 1.167 0 1 0-1.166 1.167 1.167 1.167 0 0 0 1.166-1.167Zm5.163 3.24a3.406 3.406 0 0 1-4.982.007 1 1 0 1 0-1.557 1.256 5.397 5.397 0 0 0 8.09 0 1 1 0 0 0-1.55-1.263ZM12 .503a11.5 11.5 0 1 0 11.5 11.5A11.513 11.513 0 0 0 12 .503Zm0 21a9.5 9.5 0 1 1 9.5-9.5 9.51 9.51 0 0 1-9.5 9.5Z">
-                                </path>
-                            </svg>
-
-                        </form>
+                        <app-add-comment-input [cardData]="cardData"></app-add-comment-input>
                         <div class="spinner d-none">
                             <app-spinner></app-spinner>
                         </div>

@@ -5,8 +5,8 @@ import { of, throwError } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
-import { LoginComponent } from './login.component'; // Asegúrate de importar tu componente
-import { AuthService } from '../../../services/auth/auth.service';
+import { LoginComponent } from './login.component';
+import { AuthService } from '../../services/auth/auth.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;

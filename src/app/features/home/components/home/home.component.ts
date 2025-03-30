@@ -10,6 +10,7 @@ import { AuthService } from '../../../auth/services/auth/auth.service';
 import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
 import { HeaderComponent } from '../../../../shared/header/header.component';
 import { CommentSectionsComponent } from '../comment-sections/comment-sections.component';
+import { AddCommentInputComponent } from '../add-comment-input/add-comment-input.component';
 
 @Component({
   selector: 'app-home',
@@ -19,7 +20,7 @@ import { CommentSectionsComponent } from '../comment-sections/comment-sections.c
     FormsModule,
     SpinnerComponent,
     CommentSectionsComponent,
-    
+    AddCommentInputComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.less',
@@ -27,80 +28,13 @@ import { CommentSectionsComponent } from '../comment-sections/comment-sections.c
 })
 export class HomeComponent implements OnInit {
 
-  constructor(private homeService: HomeService, private commentaryService: CommentaryService, public authService: AuthService) { }
+  constructor(public homeService: HomeService, private commentaryService: CommentaryService, public authService: AuthService) { }
 
-  hideAllEmoyiPickers(event: Event){
+  hideAllEmoyiPickers(event: Event) {
     if ((event.target as HTMLElement).closest('.emoyiPicker, .buttonToShowEmoyi, .textAreaInput')) {
       return;
     }
     document.querySelectorAll('.emoyiPicker').forEach(el => el.classList.add('d-none'));
-  }
-  addEmoji(idComment:number,event:any){
-    let textarea = document.getElementById(`comment${idComment}`) as HTMLInputElement;
-    const submitButton = textarea.nextElementSibling;
-    textarea.style.width = '380px';
-    submitButton?.classList.remove('d-none')
-    textarea.style.height = textarea.scrollHeight + "px";
-    textarea.value += event.detail.unicode;
-  }
-  showEmojiClicker(idEmoyi:number) {
-    let emoyiPicker = document.getElementById(`emoyiPicker${idEmoyi}`) as HTMLInputElement;
-    document.querySelectorAll('.emoyiPicker').forEach(el => el.classList.add('d-none'));
-    if(emoyiPicker?.classList.contains('d-none')){
-      emoyiPicker?.classList.remove('d-none');
-    }
-  }
-
-  createComment(idPublication: number) {
-    debugger;
-    const valueTextArea = document.getElementById(`comment${idPublication}`) as HTMLInputElement;
-    if (valueTextArea.value != '') {
-      this.loadingNewComment(true, idPublication);
-      this.commentaryService.createComment(valueTextArea.value, idPublication).subscribe(
-        (response) => {
-
-          this.loadingNewComment(false, idPublication);
-          this.updateDataSignal(idPublication,valueTextArea.value);
-          valueTextArea.value = '';
-        },
-        (error) => {
-          console.error('Error al crear el comentario:', error);
-        }
-      )
-    }
-  }
-
-  updateDataSignal(idPublication: number, valueTextArea: string) {
-    this.data.update((dataPublication: Publication[]) => {
-      return dataPublication.map(publication => {
-        if (publication.id === idPublication) {
-          let commentsPublication = publication['comments'];
-          commentsPublication.push(
-            {
-              'commentary': valueTextArea,
-              'created_at': new Date().toISOString(),
-              'user_id': this.authService.userData().id,
-              'publication_id': idPublication,
-              'updated_at': new Date().toISOString(),
-              'id': Date.now()
-            }
-          );
-          return { ...publication, comments: commentsPublication };
-        }
-        return publication;
-      });
-    });
-  }
-
-  loadingNewComment(showSpinner: boolean, idCard: number) {
-    const form = document.getElementById(`formComment${idCard}`) as HTMLInputElement;
-    if (showSpinner) {
-      form.classList.add('opacity-50');
-      form.nextElementSibling?.classList.remove('d-none');
-    } else {
-      form.classList.remove('opacity-50');
-      form.nextElementSibling?.classList.add('d-none');
-    }
   }
 
   myComments(comments: any) {
@@ -117,45 +51,15 @@ export class HomeComponent implements OnInit {
     return myComments;
   }
 
-  data = signal<Publication[]>([]);
+
   ngOnInit(): void {
     this.homeService.getListPublications(1).subscribe(
       (response) => {
         debugger;
         console.log(response.response.data);
-        this.data.set(response.response.data);
+        this.homeService.data.set(response.response.data);
       }
     )
-  }
-
-
-  getNumberDays(date: string) {
-
-    let msDay = (1000 * 60 * 60 * 24);
-
-    let dateMs = new Date(date).getTime();
-
-    let diff = Date.now() - dateMs;
-
-    let diffDays = Math.ceil(diff / msDay);
-
-    let result = diffDays + ' días';
-
-    let diffHours = -1;
-
-    let diffMins = -1;
-
-    if (diffDays < 1) {
-      diffHours = Math.round((diff / (1000 * 60 * 60)));
-      result = diffHours + ' h';
-    }
-
-    if (diffHours == 0) {
-      diffMins = Math.floor((diff / (1000 * 60)));
-      result = diffMins + ' m';
-    }
-
-    return result;
   }
 
   showMoreTextButton(description: string) {
@@ -172,18 +76,4 @@ export class HomeComponent implements OnInit {
     element.classList.add('d-none');
   }
 
-  resizeTextArea(event: Event) {
-    const textarea = event.target as HTMLTextAreaElement;
-
-    const submitButton = textarea.nextElementSibling;
-    if (textarea.value != '') {
-      textarea.style.width = '380px';
-      submitButton?.classList.remove('d-none')
-      textarea.style.height = textarea.scrollHeight + "px";
-    } else {
-      textarea.style.width = '100%';
-      submitButton?.classList.add('d-none');
-      textarea.style.height = '25px';
-    }
-  }
 }

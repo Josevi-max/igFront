@@ -1,3 +1,5 @@
+import { User } from "../../../../core/models/user/user";
+
 export interface Comment {
     id: number;
     commentary: string;
@@ -5,4 +7,5 @@ export interface Comment {
     publication_id: number;
     created_at: string;
     updated_at: string;
+    user:User
 }

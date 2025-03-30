@@ -1,0 +1,73 @@
+.emoyiPicker {
+    position: absolute;
+    transform: translate(132%, -100%);
+    --border-radius: 10px;
+}
+.emoyiPicker.modalSection{
+    transform: translate(0%, -103%);
+
+}
+.modalEmoyiIcon{
+    position: absolute;
+}
+.commentSection {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    margin-top: 8px;
+    textarea.modalStyle{
+        padding-top: 3px;
+        padding-left: 35px;
+    }
+    textarea {
+        padding: 0;
+        min-height: 20px;
+        max-height: 100px;
+        height: 25px;
+        width: 100%;
+        scrollbar-color: #525870 rgb(37, 40, 53);
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        outline: none;
+        resize: none;
+
+    }
+
+    textarea::placeholder {
+        color: #A8A8A8;
+    }
+
+    .publish {
+        color: #0095f6;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 0 10px;
+    }
+
+    svg {
+        cursor: pointer;
+        color: #737373;
+    }
+
+}
+
+
+textarea:focus {
+    box-shadow: none;
+}
+
+textarea:focus-visible {
+    outline: none;
+}
+
+.fa-circle-user {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.spinner {
+    position: absolute;
+    left: 48%;
+    top: 0;
+}

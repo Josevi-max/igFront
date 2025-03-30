@@ -1,0 +1,45 @@
+<div>
+    @if(isModalSection){
+    <emoji-picker class="emoyiPicker d-none modalSection" id="emoyiPickerComponentModal{{cardData['id']}}"
+        (emoji-click)="addEmoji(cardData['id'],$event)"></emoji-picker>
+    }@else {
+    <emoji-picker class="emoyiPicker d-none" id="emoyiPickerComponent{{cardData['id']}}"
+        (emoji-click)="addEmoji(cardData['id'],$event)"></emoji-picker>
+    }
+
+    <div class="position-relative">
+        @if(isModalSection){
+            <form class="commentSection" id="formCommentModal{{cardData['id']}}" (ngSubmit)="createComment($event,cardData['id'])" #myForm="ngForm">
+                <svg (click)="showEmojiClicker(cardData['id'])" aria-label="Emoji"
+                    class="buttonToShowEmoyi modalEmoyiIcon text-white" fill="currentColor" height="24" role="img"
+                    viewBox="0 0 24 24" width="24">
+                    <title>Emoji</title>
+                    <path
+                        d="M15.83 10.997a1.167 1.167 0 1 0 1.167 1.167 1.167 1.167 0 0 0-1.167-1.167Zm-6.5 1.167a1.167 1.167 0 1 0-1.166 1.167 1.167 1.167 0 0 0 1.166-1.167Zm5.163 3.24a3.406 3.406 0 0 1-4.982.007 1 1 0 1 0-1.557 1.256 5.397 5.397 0 0 0 8.09 0 1 1 0 0 0-1.55-1.263ZM12 .503a11.5 11.5 0 1 0 11.5 11.5A11.513 11.513 0 0 0 12 .503Zm0 21a9.5 9.5 0 1 1 9.5-9.5 9.51 9.51 0 0 1-9.5 9.5Z">
+                    </path>
+                </svg>
+                <textarea (input)="resizeTextArea($event)" id="commentModal{{cardData['id']}}"
+                    class="text-white bg-transparent border-0 textAreaInput modalStyle" placeholder="Añade un comentario..."
+                    aria-label="With textarea"></textarea>
+                <input type="submit" class="btn publish d-none" value="Publicar">
+            </form>
+        }@else {
+            <form class="commentSection" id="formComment{{cardData['id']}}" (ngSubmit)="createComment($event,cardData['id'])" #myForm="ngForm">
+                <textarea (input)="resizeTextArea($event)" id="comment{{cardData['id']}}"
+                    class="text-white bg-transparent border-0 textAreaInput" placeholder="Añade un comentario..."
+                    aria-label="With textarea"></textarea>
+                <input type="submit" class="btn publish d-none" value="Publicar">
+                <svg (click)="showEmojiClicker(cardData['id'])" aria-label="Emoji" class="buttonToShowEmoyi"
+                    fill="currentColor" height="13" role="img" viewBox="0 0 24 24" width="25">
+                    <title>Emoji</title>
+                    <path
+                        d="M15.83 10.997a1.167 1.167 0 1 0 1.167 1.167 1.167 1.167 0 0 0-1.167-1.167Zm-6.5 1.167a1.167 1.167 0 1 0-1.166 1.167 1.167 1.167 0 0 0 1.166-1.167Zm5.163 3.24a3.406 3.406 0 0 1-4.982.007 1 1 0 1 0-1.557 1.256 5.397 5.397 0 0 0 8.09 0 1 1 0 0 0-1.55-1.263ZM12 .503a11.5 11.5 0 1 0 11.5 11.5A11.513 11.513 0 0 0 12 .503Zm0 21a9.5 9.5 0 1 1 9.5-9.5 9.51 9.51 0 0 1-9.5 9.5Z">
+                    </path>
+                </svg>
+            </form>
+        }
+        <div class="spinner d-none">
+            <app-spinner></app-spinner>
+        </div>
+    </div>
+</div>
