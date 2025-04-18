@@ -18,7 +18,9 @@ export class CommentSectionsComponent implements OnInit {
 
     function resizeModal(): void {
       const modals = document.querySelectorAll<HTMLElement>('.modal-dialog');
-      const screenHeight = window.innerHeight + 500;
+      let valueToIndrease = 500;
+
+      const screenHeight = window.innerHeight + valueToIndrease;
 
       if (modals) {
         modals.forEach((modal) => {

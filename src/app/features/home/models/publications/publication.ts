@@ -11,4 +11,5 @@ export interface Publication {
     updated_at: string;
     user: User;
     comments: Comment[];
+    liked_by_auth_user: boolean;
 }

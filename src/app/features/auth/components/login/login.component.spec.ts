@@ -11,13 +11,19 @@ import { AuthService } from '../../services/auth/auth.service';
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
-  let toastrSpy: jasmine.SpyObj<ToastrService>;
+  let authServiceSpy: jest.Mocked<AuthService>;
+  let toastrSpy: jest.Mocked<ToastrService>;
   let router: Router;
 
   beforeEach(() => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['login']);
-    toastrSpy = jasmine.createSpyObj('ToastrService', ['info', 'error']);
+    authServiceSpy = {
+      login: jest.fn().mockReturnValue(true)
+    } as unknown as jest.Mocked<AuthService>;
+    toastrSpy = {
+      info: jest.fn(),
+      error: jest.fn()
+    } as unknown as jest.Mocked<ToastrService>;
+    
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, RouterTestingModule,LoginComponent],
@@ -31,7 +37,7 @@ describe('LoginComponent', () => {
     component = fixture.componentInstance;
 
     router = TestBed.inject(Router);
-    spyOn(router, 'navigate');
+    jest.spyOn(router, 'navigate');
   });
 
   it('should redirect home if success', () => {
@@ -42,7 +48,7 @@ describe('LoginComponent', () => {
         password: '123456789',
       }
     } as any;
-    authServiceSpy.login.and.returnValue(of({ message: 'user logged' }));
+    authServiceSpy.login.mockReturnValue(of({ message: 'user logged' }));
     component.loginUser();
     expect(authServiceSpy.login).toHaveBeenCalledWith(component.loginForm.value);
     expect(router.navigate).toHaveBeenCalledWith(['']);
@@ -58,7 +64,7 @@ describe('LoginComponent', () => {
         password: '123456789',
       }
     } as any;
-    authServiceSpy.login.and.returnValue(throwError(() => ({ error: 'Login failed' })));
+    authServiceSpy.login.mockReturnValue(throwError(() => ({ error: 'Login failed' })));
     component.loginUser();
     expect(authServiceSpy.login).toHaveBeenCalledWith(component.loginForm.value);
     expect(toastrSpy.error).toHaveBeenCalledWith('Login failed', 'Error');

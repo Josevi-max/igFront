@@ -71,7 +71,6 @@ export class AddCommentInputComponent implements OnChanges{
     if(this.isModalSection){
       form = document.getElementById(`formCommentModal${idCard}`) as HTMLInputElement;
     }
-    debugger;
     if (showSpinner) {
       form.classList.add('opacity-50');
       form.nextElementSibling?.classList.remove('d-none');
@@ -106,7 +105,6 @@ export class AddCommentInputComponent implements OnChanges{
     const textarea = event.target as HTMLTextAreaElement;
 
     const submitButton = textarea.nextElementSibling;
-    debugger;
     if (textarea.value != '') {
       //textarea.style.width = '380px';
       submitButton?.classList.remove('d-none');
