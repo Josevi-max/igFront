@@ -5,25 +5,27 @@ import { CommentaryService } from '../../services/commment/commentary.service';
 import { AuthService } from '../../../auth/services/auth/auth.service';
 import { Publication } from '../../models/publications/publication';
 import { FormsModule } from '@angular/forms';
+import { Comment } from '../../models/comments/comment';
 
 @Component({
   selector: 'app-add-comment-input',
-  imports: [SpinnerComponent,FormsModule],
+  imports: [SpinnerComponent, FormsModule],
   templateUrl: './add-comment-input.component.html',
   styleUrl: './add-comment-input.component.less',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AddCommentInputComponent implements OnChanges{
+export class AddCommentInputComponent implements OnChanges {
   constructor(private homeService: HomeService, private commentaryService: CommentaryService, public authService: AuthService) { }
   @Input() cardData: any;
   @Input() isModalSection: boolean = false;
+  @Input() isReply: boolean = false;
   ngOnChanges(changes: SimpleChanges) {
     console.log(changes);
   }
   addEmoji(idComment: number, event: any) {
     let textarea = document.getElementById(`commentModal${idComment}`) as HTMLInputElement;
 
-    if(!this.isModalSection){
+    if (!this.isModalSection) {
       textarea = document.getElementById(`comment${idComment}`) as HTMLInputElement;
     }
     const submitButton = textarea.nextElementSibling;
@@ -33,9 +35,8 @@ export class AddCommentInputComponent implements OnChanges{
     textarea.value += event.detail.unicode;
   }
   showEmojiClicker(idEmoyi: number) {
-    debugger;
     let emoyiPicker = document.getElementById(`emoyiPickerComponent${idEmoyi}`) as HTMLInputElement;
-    if(this.isModalSection){
+    if (this.isModalSection) {
       emoyiPicker = document.getElementById(`emoyiPickerComponentModal${idEmoyi}`) as HTMLInputElement;
     }
     document.querySelectorAll('.emoyiPicker').forEach(el => el.classList.add('d-none'));
@@ -44,31 +45,37 @@ export class AddCommentInputComponent implements OnChanges{
     }
   }
 
-  createComment(event: Event,idPublication: number) {
+  createComment(event: Event, idPublication: number) {
     event.preventDefault();
     let valueTextArea = document.getElementById(`commentModal${idPublication}`) as HTMLInputElement;
-    if(!this.isModalSection){
+    if (!this.isModalSection) {
       valueTextArea = document.getElementById(`comment${idPublication}`) as HTMLInputElement;
     }
-    debugger;
     if (valueTextArea.value != '') {
       this.loadingNewComment(true, idPublication);
-      debugger;
-      this.commentaryService.createComment(valueTextArea.value, idPublication).subscribe({
-        next: (response) => {
-          this.loadingNewComment(false, idPublication);
-          this.updateDataSignal(idPublication, valueTextArea.value);
-          valueTextArea.value = '';
-        },
-        error: (error) => {
-          console.error('Error al crear el comentario:', error);
-        }
-      });
+      if (this.commentaryService.idCommentWeAreReplying() != -1) {
+        this.replyComment(valueTextArea.value, idPublication);
+      } else {
+        this.commentaryService.createComment(valueTextArea.value, idPublication).subscribe({
+          next: (response) => {
+            this.loadingNewComment(false, idPublication);
+            if(this.commentaryService.idCommentWeAreReplying() == -1) {
+              response.data.user = this.authService.userData();
+              this.updateDataSignal(idPublication, response.data);
+            }
+            valueTextArea.value = '';
+          },
+          error: (error) => {
+            console.error('Error al crear el comentario:', error);
+          }
+        });
+      }
+
     }
   }
   loadingNewComment(showSpinner: boolean, idCard: number) {
     let form = document.getElementById(`formComment${idCard}`) as HTMLInputElement;
-    if(this.isModalSection){
+    if (this.isModalSection) {
       form = document.getElementById(`formCommentModal${idCard}`) as HTMLInputElement;
     }
     if (showSpinner) {
@@ -79,45 +86,53 @@ export class AddCommentInputComponent implements OnChanges{
       form.nextElementSibling?.classList.add('d-none');
     }
   }
-  updateDataSignal(idPublication: number, valueTextArea: string) {
+  updateDataSignal(idPublication: number, dataCommentary: Comment) {
     this.homeService.data.update((dataPublication: any[]) => {
-      // Buscar la publicación a modificar
       const publication = dataPublication.find(p => p.id === idPublication);
-      
+
       if (publication) {
-        // Agregar comentario directamente sin cambiar la referencia del array
-        publication.comments.push({
-          'commentary': valueTextArea,
-          'created_at': new Date().toISOString(),
-          'user_id': this.authService.userData().id,
-          'publication_id': idPublication,
-          'updated_at': new Date().toISOString(),
-          'id': Date.now(),
-          'user': { ...this.authService.userData() }
-        });
+        publication.comments.push(dataCommentary);
       }
-  
-      return dataPublication; // Mantener la misma referencia del array
+
+      return dataPublication;
     });
   }
-  
+
   resizeTextArea(event: Event) {
     const textarea = event.target as HTMLTextAreaElement;
 
     const submitButton = textarea.nextElementSibling;
     if (textarea.value != '') {
-      //textarea.style.width = '380px';
       submitButton?.classList.remove('d-none');
       submitButton?.classList.remove('isInModal');
       textarea.style.height = textarea.scrollHeight + "px";
     } else {
       textarea.style.width = '100%';
-      if(this.isModalSection){
+      if (this.isModalSection) {
         submitButton?.classList.add('isInModal');
-      }else{
+      } else {
         submitButton?.classList.add('d-none');
       }
       textarea.style.height = '25px';
     }
+  }
+  replyComment(comment: string, idPublication: number): void {
+    debugger;
+    this.commentaryService.replyComment(comment, this.commentaryService.idCommentWeAreReplying(),idPublication).subscribe({
+      next: (response) => {
+        debugger;
+        this.loadingNewComment(false, idPublication);
+        let valueTextArea = document.getElementById(`commentModal${idPublication}`) as HTMLInputElement;
+        response.data.user = this.authService.userData();
+        this.commentaryService.updateListOfReplies(response.data);
+        this.commentaryService.idCommentWeAreReplying.set(-1);
+        valueTextArea.value = '';
+        
+      },
+      error: (error) => {
+        console.error('Error al crear la replica del comentario:', error);
+      }
+
+    })
   }
 }

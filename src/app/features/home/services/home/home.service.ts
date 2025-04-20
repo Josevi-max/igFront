@@ -87,4 +87,8 @@ export class HomeService {
 
     return result;
   }
+
+  public replyComment(comment: string,publicationId:number,commentaryId:number): Observable<any> {
+    return this.http.post(config.api.URL_BACKEND + '/comments/reply', {comment,publicationId,commentaryId});
+  }
 }

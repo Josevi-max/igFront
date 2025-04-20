@@ -116,7 +116,6 @@
 .card-body {
     overflow: auto;
     -ms-overflow-style: none;
-    /* Internet Explorer 10+ */
     scrollbar-width: none;
     padding-bottom: 10px;
 }
@@ -158,7 +157,17 @@
     .mainCardContent {
         background: #000;
         color: #fff;
-
+        .lineSeparator {
+            display: inline-block;
+            width: 24px;
+            border-bottom: 1px solid rgb(168, 168, 168);
+        }
+        .seeResponses {
+            padding: 0 15px;
+            font-size: 14px;
+            color: #A8A8A8;
+            cursor: pointer;
+        }
         .dataUser {
             display: grid;
             align-items: center;

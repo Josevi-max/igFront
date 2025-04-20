@@ -7,5 +7,7 @@ export interface Comment {
     publication_id: number;
     created_at: string;
     updated_at: string;
-    user:User
+    user:User,
+    reply_to_id?: number;
+    reply_to_user?: User;
 }
