@@ -12,51 +12,72 @@ export class HomeService {
   http = inject(HttpClient);
   data = signal<Publication[]>([]);
 
+  private pendingLikes = new Set<number>();
+  private pendingDislikes = new Set<number>();
+
+  private readonly MIN_TIME_TO_LIKE_DISLIKE:number = 1000;
   public getListPublications(page: number): Observable<any> {
     return this.http.get(config.api.URL_BACKEND + '/publications/page/' + page);
   }
 
-
   public addLikePublication(publicationId: number): void {
-    this.http.post(config.api.URL_BACKEND + '/publications/like', {
-      'publicationId': publicationId
-    }).subscribe({
-      next: (response) => {
-        this.data.update((publications) => {
-          return publications.map((publication) => {
-            if (publication.id == publicationId) {
-              ++publication.likes;
-              publication.liked_by_auth_user = true;
-            }
-            return publication;
-          });
-        });
-      }, error: (error) => {
-        if(error.status == 400 && error.error.message == 'You have already liked this publication') {
-          this.removeLikePublication(publicationId);
+    if (this.pendingLikes.has(publicationId)) return;
+    this.pendingLikes.add(publicationId);
+
+    this.data.update((publications) => {
+      return publications.map((publication) => {
+        if (publication.id == publicationId) {
+          ++publication.likes;
+          publication.liked_by_auth_user = true;
         }
-      }
+        return publication;
+      });
     });
+
+    setTimeout(() => {
+      this.http.post(config.api.URL_BACKEND + '/publications/like', {
+        publicationId: publicationId
+      }).subscribe({
+        next: () => {
+          this.pendingLikes.delete(publicationId);
+        },
+        error: (error) => {
+          this.pendingLikes.delete(publicationId);
+          if (error.status == 400 && error.error.message == 'You have already liked this publication') {
+            this.removeLikePublication(publicationId);
+          }
+        }
+      });
+    }, this.MIN_TIME_TO_LIKE_DISLIKE);
   }
 
   public removeLikePublication(publicationId: number): void {
-    this.http.post(config.api.URL_BACKEND + '/publications/unlike', {
-      'publicationId': publicationId
-    }).subscribe({
-      next: (response) => {
-        this.data.update((publications) => {
-          return publications.map((publication) => {
-            if (publication.id == publicationId) {
-              --publication.likes;
-              publication.liked_by_auth_user = false;
-            }
-            return publication;
-          });
-        });
-      }, error: (error) => {
-        console.log(error);
-      }
+    if (this.pendingDislikes.has(publicationId)) return;
+    this.pendingDislikes.add(publicationId);
+
+    this.data.update((publications) => {
+      return publications.map((publication) => {
+        if (publication.id == publicationId) {
+          --publication.likes;
+          publication.liked_by_auth_user = false;
+        }
+        return publication;
+      });
     });
+
+    setTimeout(() => {
+      this.http.post(config.api.URL_BACKEND + '/publications/unlike', {
+        'publicationId': publicationId
+      }).subscribe({
+        next: (response) => {
+          this.pendingDislikes.delete(publicationId);
+          console.log(response);
+        }, error: (error) => {
+          console.log(error);
+        }
+      });
+
+    },this.MIN_TIME_TO_LIKE_DISLIKE);
   }
 
   public getNumberDays(date: string) {
@@ -86,9 +107,5 @@ export class HomeService {
     }
 
     return result;
-  }
-
-  public replyComment(comment: string,publicationId:number,commentaryId:number): Observable<any> {
-    return this.http.post(config.api.URL_BACKEND + '/comments/reply', {comment,publicationId,commentaryId});
   }
 }

@@ -72,16 +72,16 @@
                 <div class="commentFooter">
                   <div class="lineSeparator"></div>
                   <span (click)="seeResponses(comment.id)" class="seeResponses" id="seeResponses{{comment.id}}">Ver
-                    respuestas ({{numberOfResponses(comment.id)}})</span>
+                    respuestas ({{this.commentaryService.numberOfResponses(comment.id)}})</span>
 
                 </div>
                 }
                 <div id="replies{{comment.id}}" class="d-none">
                   @for (reply of this.commentaryService.listOfReplies().slice().reverse(); track $index) {
-                  @if(reply.reply_to_id == comment.id) {
-                  <app-comment-box [dataComment]="reply" [idModal]="dataModal['id']"
-                    [isAReply]="true"></app-comment-box>
-                  }
+                    @if(reply.reply_to_id == comment.id) {
+                    <app-comment-box [dataComment]="reply" [idModal]="dataModal['id']"
+                      [isAReply]="true"></app-comment-box>
+                    }
                   }
                 </div>
 

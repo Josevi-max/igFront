@@ -52,27 +52,16 @@ export class CommentSectionsComponent implements OnInit {
 
   seeResponses(idComment:number):void{
     let element = document.getElementById(`seeResponses${idComment}`) as HTMLInputElement;
-    if(element.innerText == 'Ver respuestas ('+ this.numberOfResponses(idComment)+')'){
+    if(element.innerText == 'Ver respuestas ('+ this.commentaryService.numberOfResponses(idComment)+')'){
       element.innerText = 'Ocultar respuestas';
 
       document.getElementById(`replies${idComment}`)?.classList.remove('d-none');
 
 
     }else{
-      element.innerText = 'Ver respuestas ('+ this.numberOfResponses(idComment)+')';
+      element.innerText = 'Ver respuestas ('+ this.commentaryService.numberOfResponses(idComment)+')';
       document.getElementById(`replies${idComment}`)?.classList.add('d-none');
 
     }
-  }
-
-  numberOfResponses(idComment:any):number {
-    let numberOfResponses = 0;
-    this.dataModal['comments'].forEach((comment:Comment) => {
-      if(comment.reply_to_id == idComment) {
-        numberOfResponses++;
-      }
-    });
-
-    return numberOfResponses;
   }
 }

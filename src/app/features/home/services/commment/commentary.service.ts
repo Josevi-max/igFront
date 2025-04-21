@@ -13,6 +13,10 @@ export class CommentaryService {
   idCommentWeAreReplying = signal<number>(-1);
   idCommentsWithReply = signal<number[]>([]);
   listOfReplies = signal<Comment[]>([]);
+  public numberOfResponses(idComment: number): number {
+    const replies = this.listOfReplies();
+    return replies.filter((comment: Comment) => comment.reply_to_id === idComment).length;
+  }
   public createComment(commentary: string, publicationId: number): Observable<any> {
     return this.http.post(config.api.URL_BACKEND + '/comment/new-comment', {
       'comment': commentary,

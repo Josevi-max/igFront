@@ -125,9 +125,11 @@ export class AddCommentInputComponent implements OnChanges {
         let valueTextArea = document.getElementById(`commentModal${idPublication}`) as HTMLInputElement;
         response.data.user = this.authService.userData();
         this.commentaryService.updateListOfReplies(response.data);
+        this.commentaryService.idCommentsWithReply.update((data:any) => {
+          return [...data, this.commentaryService.idCommentWeAreReplying()];
+        });
         this.commentaryService.idCommentWeAreReplying.set(-1);
         valueTextArea.value = '';
-        
       },
       error: (error) => {
         console.error('Error al crear la replica del comentario:', error);
