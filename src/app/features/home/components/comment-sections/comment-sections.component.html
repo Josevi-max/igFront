@@ -50,6 +50,8 @@
 
               </div>
               <div class="card-body">
+                @if(this.commentaryService.listOfComments().length > 0) {
+
                 <div class="sectionComment">
                   <div class="comment">
                     <i class="fa-solid fa-circle-user"></i>
@@ -62,7 +64,7 @@
                     <span class="time">{{this.homeService.getNumberDays(dataModal['created_at'])}}</span>
                   </div>
                 </div>
-                @for (comment of dataModal['comments'].slice().reverse(); track $index) {
+                @for (comment of this.commentaryService.listOfComments().slice().reverse(); track $index) {
                 <div class="sectionComment">
                   @if(comment.reply_to_id == null) {
                   <app-comment-box [dataComment]="comment" [idModal]="dataModal['id']"></app-comment-box>
@@ -78,14 +80,18 @@
                 }
                 <div id="replies{{comment.id}}" class="d-none">
                   @for (reply of this.commentaryService.listOfReplies().slice().reverse(); track $index) {
-                    @if(reply.reply_to_id == comment.id) {
-                    <app-comment-box [dataComment]="reply" [idModal]="dataModal['id']"
-                      [isAReply]="true"></app-comment-box>
-                    }
+                  @if(reply.reply_to_id == comment.id) {
+                  <app-comment-box [dataComment]="reply" [idModal]="dataModal['id']"
+                    [isAReply]="true"></app-comment-box>
+                  }
                   }
                 </div>
 
                 }
+                }@else {
+                  <app-spinner class="d-flex justify-content-center align-items-center h-100"></app-spinner>
+                }
+
               </div>
               <div class="footer">
                 <div class="interactiveButtons">

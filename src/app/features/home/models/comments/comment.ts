@@ -10,4 +10,6 @@ export interface Comment {
     user:User,
     reply_to_id?: number;
     reply_to_user?: User;
+    likes: any[];
+    is_liked?: boolean;
 }

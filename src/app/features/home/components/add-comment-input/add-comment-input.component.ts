@@ -92,6 +92,9 @@ export class AddCommentInputComponent implements OnChanges {
 
       if (publication) {
         publication.comments.push(dataCommentary);
+        this.commentaryService.listOfComments.update((data: any) => {
+          return [...data, dataCommentary];
+        });
       }
 
       return dataPublication;
@@ -117,14 +120,15 @@ export class AddCommentInputComponent implements OnChanges {
     }
   }
   replyComment(comment: string, idPublication: number): void {
-    debugger;
     this.commentaryService.replyComment(comment, this.commentaryService.idCommentWeAreReplying(),idPublication).subscribe({
       next: (response) => {
-        debugger;
         this.loadingNewComment(false, idPublication);
         let valueTextArea = document.getElementById(`commentModal${idPublication}`) as HTMLInputElement;
         response.data.user = this.authService.userData();
         this.commentaryService.updateListOfReplies(response.data);
+        this.commentaryService.listOfComments.update((data: any) => {
+          return [...data, response.data];
+        });
         this.commentaryService.idCommentsWithReply.update((data:any) => {
           return [...data, this.commentaryService.idCommentWeAreReplying()];
         });
