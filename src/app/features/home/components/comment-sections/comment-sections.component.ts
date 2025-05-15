@@ -18,15 +18,6 @@ export class CommentSectionsComponent implements OnInit, AfterViewInit {
 
   constructor(public homeService: HomeService, public commentaryService: CommentaryService) { }
   ngOnInit(): void {
-    console.log(this.dataModal);
-    this.dataModal['comments'].forEach((comment: Comment) => {
-      if (comment.reply_to_id != null) {
-        this.commentaryService.idCommentsWithReply.update((data: any) => {
-          return [...data, comment.reply_to_id];
-        });
-        this.commentaryService.updateListOfReplies(comment);
-      }
-    });
     function resizeModal(): void {
       const modals = document.querySelectorAll<HTMLElement>('.modal-dialog');
       let valueToIndrease = 500;

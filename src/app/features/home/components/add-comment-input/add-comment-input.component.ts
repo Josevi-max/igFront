@@ -6,6 +6,7 @@ import { AuthService } from '../../../auth/services/auth/auth.service';
 import { Publication } from '../../models/publications/publication';
 import { FormsModule } from '@angular/forms';
 import { Comment } from '../../models/comments/comment';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-add-comment-input',
@@ -56,10 +57,12 @@ export class AddCommentInputComponent implements OnChanges {
       if (this.commentaryService.idCommentWeAreReplying() != -1) {
         this.replyComment(valueTextArea.value, idPublication);
       } else {
-        this.commentaryService.createComment(valueTextArea.value, idPublication).subscribe({
+        this.commentaryService.createComment(valueTextArea.value, idPublication).pipe(
+          take(1)
+        ).subscribe({
           next: (response) => {
             this.loadingNewComment(false, idPublication);
-            if(this.commentaryService.idCommentWeAreReplying() == -1) {
+            if (this.commentaryService.idCommentWeAreReplying() == -1) {
               response.data.user = this.authService.userData();
               this.updateDataSignal(idPublication, response.data);
             }
@@ -120,7 +123,9 @@ export class AddCommentInputComponent implements OnChanges {
     }
   }
   replyComment(comment: string, idPublication: number): void {
-    this.commentaryService.replyComment(comment, this.commentaryService.idCommentWeAreReplying(),idPublication).subscribe({
+    this.commentaryService.replyComment(comment, this.commentaryService.idCommentWeAreReplying(), idPublication).pipe(
+      take(1)
+    ).subscribe({
       next: (response) => {
         this.loadingNewComment(false, idPublication);
         let valueTextArea = document.getElementById(`commentModal${idPublication}`) as HTMLInputElement;
@@ -129,7 +134,7 @@ export class AddCommentInputComponent implements OnChanges {
         this.commentaryService.listOfComments.update((data: any) => {
           return [...data, response.data];
         });
-        this.commentaryService.idCommentsWithReply.update((data:any) => {
+        this.commentaryService.idCommentsWithReply.update((data: any) => {
           return [...data, this.commentaryService.idCommentWeAreReplying()];
         });
         this.commentaryService.idCommentWeAreReplying.set(-1);

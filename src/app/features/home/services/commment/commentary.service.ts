@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { config } from '../../../../config/config';
 import { Comment } from '../../models/comments/comment';
 import { HomeService } from '../home/home.service';
@@ -47,17 +47,17 @@ export class CommentaryService {
     this.listOfComments.update((comments: Comment[]) => {
       return comments.map((comment: Comment) => {
         if (comment.id == commentId) {
-          comment.likes.push({user_id : this.authService.userData().id});
+          comment.likes.push({ user_id: this.authService.userData().id });
           comment.is_liked = true;
         }
         return comment;
       });
     });
-    if(isReply) {
+    if (isReply) {
       this.listOfReplies.update((comments: Comment[]) => {
         return comments.map((comment: Comment) => {
           if (comment.id == commentId) {
-            comment.likes.push({user_id : this.authService.userData().id});
+            comment.likes.push({ user_id: this.authService.userData().id });
             comment.is_liked = true;
           }
           return comment;
@@ -66,7 +66,9 @@ export class CommentaryService {
 
     }
     setTimeout(() => {
-      this.http.post(config.api.URL_BACKEND + '/comment/like', { 'commentaryId': commentId }).subscribe({
+      this.http.post(config.api.URL_BACKEND + '/comment/like', { 'commentaryId': commentId }).pipe(
+        take(1)
+      ).subscribe({
         next: (data) => {
           this.pendingLikes.delete(commentId);
         },
@@ -89,17 +91,17 @@ export class CommentaryService {
     this.listOfComments.update((comments: Comment[]) => {
       return comments.map((comment: Comment) => {
         if (comment.id == commentId) {
-          comment.likes  = comment.likes.filter((like: any) => like.user_id != this.authService.userData().id);
+          comment.likes = comment.likes.filter((like: any) => like.user_id != this.authService.userData().id);
           comment.is_liked = false;
         }
         return comment;
       });
     });
-    if(isReply) {
+    if (isReply) {
       this.listOfReplies.update((comments: Comment[]) => {
         return comments.map((comment: Comment) => {
           if (comment.id == commentId) {
-            comment.likes  = comment.likes.filter((like: any) => like.user_id != this.authService.userData().id);
+            comment.likes = comment.likes.filter((like: any) => like.user_id != this.authService.userData().id);
             comment.is_liked = false;
           }
           return comment;
@@ -108,7 +110,9 @@ export class CommentaryService {
 
     }
     setTimeout(() => {
-      this.http.post(config.api.URL_BACKEND + '/comment/unlike', { 'commentaryId': commentId }).subscribe({
+      this.http.post(config.api.URL_BACKEND + '/comment/unlike', { 'commentaryId': commentId }).pipe(
+        take(1)
+      ).subscribe({
         next: (data) => {
           this.pendingDislikes.delete(commentId);
           console.log(data);
@@ -125,9 +129,20 @@ export class CommentaryService {
 
 
   public getCommentaryByPublicationId(publicationId: number): void {
-    this.http.get(config.api.URL_BACKEND + '/comment/get-commentaries/' + publicationId).subscribe({
+    this.http.get(config.api.URL_BACKEND + '/comment/get-commentaries/' + publicationId).pipe(
+      take(1)
+    ).subscribe({
       next: (response: any) => {
         this.listOfComments.set(response.data);
+        this.listOfComments().forEach((comment: Comment) => {
+
+          if (comment.reply_to_id != null) {
+            this.idCommentsWithReply.update((data: any) => {
+              return [...data, comment.reply_to_id];
+            });
+            this.updateListOfReplies(comment);
+          }
+        });
       },
       error: (error) => {
         console.log(error);

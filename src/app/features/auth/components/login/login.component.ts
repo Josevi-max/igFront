@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth/auth.service';
 import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
+import { take } from 'rxjs';
 @Component({
   selector: 'app-login',
   imports: [
@@ -36,7 +37,10 @@ export class LoginComponent {
 
   loginUser(){
     if(this.loginForm?.valid) {
-      this._authService.login(this.loginForm.value).subscribe(
+      this._authService.login(this.loginForm.value).pipe(
+        take(1)
+      )
+      .subscribe(
         (response) => {
           //this.toastr.info('¡Usuario autenticado, redirigiendo al home!', 'Éxito');
           this.router.navigate(['']);

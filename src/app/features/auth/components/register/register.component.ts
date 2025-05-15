@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth/auth.service';
 import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -52,7 +53,10 @@ export class RegisterComponent {
   registerUser() {
     if (this.registerForm.valid) {
       this.loading = true;
-      this._authService.register(this.registerForm.value).subscribe(
+      this._authService.register(this.registerForm.value).pipe(
+              take(1)
+            )
+            .subscribe(
         (response) => {
           this.toastr.info('¡Usuario registrado, redirigiendo al login!', 'Éxito');
           this.router.navigate(['auth/login']);

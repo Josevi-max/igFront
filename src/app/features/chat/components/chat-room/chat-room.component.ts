@@ -5,7 +5,7 @@ import { ListFriendsComponent } from '../list-friends/list-friends.component';
 import { FormsModule } from '@angular/forms';
 import Pusher from 'pusher-js';
 import Echo from 'laravel-echo';
-import { takeUntil } from 'rxjs';
+import { take, takeUntil } from 'rxjs';
 import { HeaderComponent } from '../../../../shared/header/header.component';
 import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
 import { ChatService } from '../../services/chat/chat.service';
@@ -40,29 +40,38 @@ export class ChatRoomComponent implements OnDestroy {
   usersInRoom: number = 1;
   showTypingGif = false;
   constructor(private route: ActivatedRoute, public auth: AuthService, private _chatService: ChatService) {
-    this.route.params.subscribe(
-      params => {
-        this.loading = true;
-        const id = params['id'];
-        this.idFriend = id;
-        this.getMessagesChat();
-        this._chatService.getInfoUserChat(this.idFriend).subscribe(
-          (response) => {
-            this.dataFriend.set(response.data);
-            this.loading = false
-          },
-          takeUntil(this.onDestroy())
-        )
-        this._chatService.getOrCreateRoom(this.idFriend).subscribe(
-          (response) => {
-            this.roomId = response.data['roomId'];
-            this.joinRoom();
-          },
-          takeUntil(this.onDestroy())
-        )
-      },
-      takeUntil(this.onDestroy())
-    );
+    this.route.params.pipe(
+      take(1)
+    )
+      .subscribe(
+        params => {
+          this.loading = true;
+          const id = params['id'];
+          this.idFriend = id;
+          this.getMessagesChat();
+          this._chatService.getInfoUserChat(this.idFriend).pipe(
+            take(1)
+          )
+            .subscribe(
+              (response) => {
+                this.dataFriend.set(response.data);
+                this.loading = false
+              },
+              takeUntil(this.onDestroy())
+            )
+          this._chatService.getOrCreateRoom(this.idFriend).pipe(
+            take(1)
+          )
+            .subscribe(
+              (response) => {
+                this.roomId = response.data['roomId'];
+                this.joinRoom();
+              },
+              takeUntil(this.onDestroy())
+            )
+        },
+        takeUntil(this.onDestroy())
+      );
     effect(() => {
       if (this.isTyping()) {
         setTimeout(() => {
@@ -70,7 +79,9 @@ export class ChatRoomComponent implements OnDestroy {
             this.isTyping.set(false);
             this._chatService
               .sendTypingEvent(this.roomId, this.isTyping(), this.auth.userData().id)
-              .subscribe({
+              .pipe(
+                take(1)
+              ).subscribe({
                 next: () => console.log('Evento de detención de escritura enviado'),
                 error: (err) => console.error('Error al enviar el evento:', err)
               });
@@ -83,7 +94,9 @@ export class ChatRoomComponent implements OnDestroy {
   onInput() {
     if (!this.isTyping()) {
       this.isTyping.set(true);
-      this._chatService.sendTypingEvent(this.roomId, this.isTyping(), this.auth.userData().id).subscribe();
+      this._chatService.sendTypingEvent(this.roomId, this.isTyping(), this.auth.userData().id).pipe(
+        take(1)
+      ).subscribe();
     }
   }
 
@@ -118,7 +131,9 @@ export class ChatRoomComponent implements OnDestroy {
         this.updateListMessage(data['chat']);
       }
 
-      this._chatService.changeStatusMessage(data['chat'].status, data['chat'].id).subscribe(
+      this._chatService.changeStatusMessage(data['chat'].status, data['chat'].id).pipe(
+        take(1)
+      ).subscribe(
         (data: any) => {
           console.log(data);
         }, (error) => {
@@ -135,7 +150,9 @@ export class ChatRoomComponent implements OnDestroy {
     channel.here((users: any[]) => {
       this.usersInRoom = users.length;
       if (this.usersInRoom > 1) {
-        this._chatService.changeStatusMessage('read').subscribe(
+        this._chatService.changeStatusMessage('read').pipe(
+          take(1)
+        ).subscribe(
           (data: any) => {
             console.log(data);
           }, (error) => {
@@ -148,7 +165,9 @@ export class ChatRoomComponent implements OnDestroy {
 
     channel.joining((user: any) => {
       this.usersInRoom++;
-      this._chatService.changeStatusMessage('read').subscribe(
+      this._chatService.changeStatusMessage('read').pipe(
+        take(1)
+      ).subscribe(
         (data: any) => {
           console.log(data);
         }, (error) => {
@@ -168,9 +187,11 @@ export class ChatRoomComponent implements OnDestroy {
     if (this.textMessage != '') {
       var tempId: string = Math.random().toString(36).substr(2, 9);
       this.addTemporalCopy(this.textMessage, tempId);
-      let valueMessage =  this.textMessage;
+      let valueMessage = this.textMessage;
       this.textMessage = '';
-      this._chatService.sendMessage(valueMessage, this.idFriend, tempId).subscribe(
+      this._chatService.sendMessage(valueMessage, this.idFriend, tempId).pipe(
+        take(1)
+      ).subscribe(
         (data: any) => {
           console.log(data);
         }, (error) => {
@@ -196,7 +217,9 @@ export class ChatRoomComponent implements OnDestroy {
   }
 
   getMessagesChat() {
-    return this._chatService.getMessagesChat(this.idFriend).subscribe(
+    return this._chatService.getMessagesChat(this.idFriend).pipe(
+      take(1)
+    ).subscribe(
       (data: any) => {
         this.messages.set(data.response);
       }, (error) => {

@@ -2,7 +2,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, HostListener, OnInit, si
 import { Route } from '@angular/router';
 import { HomeService } from '../../services/home/home.service';
 import { CommonModule } from '@angular/common';
-import { catchError, Observable } from 'rxjs';
+import { catchError, Observable, take } from 'rxjs';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommentaryService } from '../../services/commment/commentary.service';
 import { Publication } from '../../models/publications/publication';
@@ -53,7 +53,9 @@ export class HomeComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.homeService.getListPublications(1).subscribe(
+    this.homeService.getListPublications(1).pipe(
+      take(1)
+    ).subscribe(
       (response) => {
         debugger;
         console.log(response.response.data);

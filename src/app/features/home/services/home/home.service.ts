@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { config } from '../../../../config/config';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { Publication } from '../../models/publications/publication';
 
 @Injectable({
@@ -15,7 +15,7 @@ export class HomeService {
   private pendingLikes = new Set<number>();
   private pendingDislikes = new Set<number>();
 
-  private readonly MIN_TIME_TO_LIKE_DISLIKE:number = 1000;
+  private readonly MIN_TIME_TO_LIKE_DISLIKE: number = 1000;
   public getListPublications(page: number): Observable<any> {
     return this.http.get(config.api.URL_BACKEND + '/publications/page/' + page);
   }
@@ -37,7 +37,9 @@ export class HomeService {
     setTimeout(() => {
       this.http.post(config.api.URL_BACKEND + '/publications/like', {
         publicationId: publicationId
-      }).subscribe({
+      }).pipe(
+        take(1)
+      ).subscribe({
         next: () => {
           this.pendingLikes.delete(publicationId);
         },
@@ -68,7 +70,9 @@ export class HomeService {
     setTimeout(() => {
       this.http.post(config.api.URL_BACKEND + '/publications/unlike', {
         'publicationId': publicationId
-      }).subscribe({
+      }).pipe(
+        take(1)
+      ).subscribe({
         next: (response) => {
           this.pendingDislikes.delete(publicationId);
           console.log(response);
@@ -77,7 +81,7 @@ export class HomeService {
         }
       });
 
-    },this.MIN_TIME_TO_LIKE_DISLIKE);
+    }, this.MIN_TIME_TO_LIKE_DISLIKE);
   }
 
   public getNumberDays(date: string) {
