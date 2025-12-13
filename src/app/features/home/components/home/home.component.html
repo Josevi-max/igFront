@@ -88,7 +88,7 @@
                             *ngIf="cardData['comments'].length > 0">Ver los {{cardData['comments'].length}}
                             comentarios</span>
                         <p class="text-white" *ngFor="let comment of myComments(cardData['comments'])">
-                            <span class="fw-bold">{{this.authService.userData().username}}</span> {{comment}}
+                            <span class="fw-bold">{{this.authManagementService.userDataValue()?.username}}</span> {{comment}}
                         </p>
                     </div>
                     <div class="position-relative">

@@ -1,26 +1,21 @@
-import { Component, input } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ToastrService } from 'ngx-toastr';
-import { AuthService } from '../../services/auth/auth.service';
-import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
-import { take } from 'rxjs';
+import { AuthFacadeService } from '../../../../core/state/auth/facade/auth-facade.service';
 @Component({
   selector: 'app-login',
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule,
-    SpinnerComponent,
+    RouterModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.less'
 })
 export class LoginComponent {
-  loading = false;
-  loginForm = new FormGroup({
+  public loginForm:FormGroup = new FormGroup({
     email: new FormControl('', [
       Validators.required,
       Validators.email
@@ -30,30 +25,9 @@ export class LoginComponent {
       Validators.minLength(6)
     ])
   });
-  constructor(private router: Router, private _authService: AuthService, private toastr: ToastrService) {
+  private readonly _authFacadeService = inject(AuthFacadeService);
 
-  }
-
-
-  loginUser(){
-    if(this.loginForm?.valid) {
-      this._authService.login(this.loginForm.value).pipe(
-        take(1)
-      )
-      .subscribe(
-        (response) => {
-          //this.toastr.info('¡Usuario autenticado, redirigiendo al home!', 'Éxito');
-          this.router.navigate(['']);
-          this.loading = false;
-        },
-        (error) => {
-          console.log(error);
-          this.toastr.error(error.error, 'Error');
-          this.loading = false;
-        }
-      );
-    }
-  }
+  public passwordFieldType = this._authFacadeService.passwordVisibility;
 
   get emailInvalid(): boolean {
     const emailControl = this.loginForm.get('email');
@@ -65,14 +39,13 @@ export class LoginComponent {
     return Boolean(passwordControl?.touched && (passwordControl?.hasError('required') || passwordControl?.hasError('minlength')));
   }
 
-  showPassword(){
-    let input = document.querySelector('input[name="password"]') as HTMLInputElement;
-    let typeInput = input?.type;
-    if(typeInput == 'password'){
-      input.type = 'text';
+  public loginUser():void{
+    if(this.loginForm?.valid) {
+      this._authFacadeService.login(this.loginForm.value);
     }
-    if(typeInput == 'text'){
-      input.type = 'password';
-    } 
+  }
+
+  public tooglePassword():void {
+    this._authFacadeService.tooglePassword();
   }
 }

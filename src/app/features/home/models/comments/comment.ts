@@ -1,4 +1,4 @@
-import { User } from "../../../../core/models/user/user";
+import { User } from "../../../../core/domain/auth/models/auth.model";
 
 export interface Comment {
     id: number;

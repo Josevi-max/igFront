@@ -1,4 +1,4 @@
-<div [ngClass]="{'d-none':loading}">
+<div>
     <div class="container px-4 pt-5  text-center  mt-5 containerRegister">
         <div class="row  align-items-center">
             <div class=" mb-3 " style="z-index: 10">
@@ -31,14 +31,13 @@
                         <div class="form-outline mb-2">
                             <div [ngClass]="{'errorIconPassword' : passwordInvalid, 'validIconPassword': !passwordInvalid && loginForm.get('password')?.touched}"
                                 class="position-relative form-floating">
-                                <input type="password" id="passwordInput" placeholder="" name="password"
+                                <input [type]="passwordFieldType()" id="passwordInput" placeholder="" name="password"
                                     formControlName="password" class="form-control"
                                     [ngClass]="{'error' : passwordInvalid}" />
                                 <label for="passwordInput">Contraseña</label>
-                                <span class="btn" (click)="showPassword()"
+                                <span class="btn" (click)="tooglePassword()"
                                     [ngClass]="{'showPassword' : loginForm.get('password')?.dirty, 'd-none': !loginForm.get('password')?.dirty }">Mostrar</span>
                             </div>
-
                             <p class="text-start text-danger ps-2 pt-1"
                                 *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">
                                 Contraseña requerida
@@ -102,5 +101,3 @@
         </div>
     </div>
 </div>
-
-<app-spinner *ngIf="loading"></app-spinner>

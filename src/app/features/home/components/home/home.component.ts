@@ -1,16 +1,14 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, HostListener, OnInit, signal } from '@angular/core';
-import { Route } from '@angular/router';
 import { HomeService } from '../../services/home/home.service';
 import { CommonModule } from '@angular/common';
-import { catchError, Observable, take } from 'rxjs';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { take } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 import { CommentaryService } from '../../services/commment/commentary.service';
-import { Publication } from '../../models/publications/publication';
-import { AuthService } from '../../../auth/services/auth/auth.service';
 import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
 import { HeaderComponent } from '../../../../shared/header/header.component';
 import { CommentSectionsComponent } from '../comment-sections/comment-sections.component';
 import { AddCommentInputComponent } from '../add-comment-input/add-comment-input.component';
+import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
 
 @Component({
   selector: 'app-home',
@@ -28,7 +26,7 @@ import { AddCommentInputComponent } from '../add-comment-input/add-comment-input
 })
 export class HomeComponent implements OnInit {
 
-  constructor(public homeService: HomeService, private commentaryService: CommentaryService, public authService: AuthService) { }
+  constructor(public homeService: HomeService, private commentaryService: CommentaryService, public authManagementService: AuthManagementService) { }
 
   hideAllEmoyiPickers(event: Event) {
     if ((event.target as HTMLElement).closest('.emoyiPicker, .buttonToShowEmoyi, .textAreaInput')) {
@@ -42,7 +40,7 @@ export class HomeComponent implements OnInit {
     if (comments.length > 0) {
       for (let index = (comments.length - 1); index > 0; index--) {
         const comment = comments[index];
-        if (comment.user_id == this.authService.userData().id && myComments.length < 3) {
+        if (comment.user_id == this.authManagementService.userDataValue()?.id && myComments.length < 3) {
           myComments.unshift(comment.commentary);
         }
       }

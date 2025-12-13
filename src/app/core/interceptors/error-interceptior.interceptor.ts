@@ -1,35 +1,32 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { catchError, throwError } from 'rxjs';
-import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { AuthService } from '../../features/auth/services/auth/auth.service';
+import { HttpErrorResponse, HttpInterceptorFn } from "@angular/common/http";
+import { inject } from "@angular/core";
+import { AuthFacadeService } from "../state/auth/facade/auth-facade.service";
+import { Router } from "@angular/router";
+import { ToastrService } from "ngx-toastr";
+import { catchError, throwError } from "rxjs";
 
 export const errorInterceptiorInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
+  const authFacadeService = inject(AuthFacadeService);
   const router = inject(Router);
   const toastr = inject(ToastrService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Si el error contiene un mensaje 'info' dentro de 'error.error', lo mostramos
-      if (error.error && error.error.info) {
-        toastr.info(error.error.info, 'Atención');
+
+      if (req.url.includes('auth/login')) {
+        return throwError(() => error);
       }
 
-      // Si la URL es 'auth/login', simplemente pasamos la solicitud
-      if (['auth/login'].some(url => req.url.includes(url))) {
-        return next(req);
-      }
+      const message = error.error?.info ?? 'Ha ocurrido un error inesperado';
+      toastr.info(message, 'Atención');
 
-      // Manejo de estado 401 (No autorizado)
       if (error.status === 401) {
-        authService.logout();
+        authFacadeService.logout();
         toastr.info('Sesión caducada, redirigiendo al login', 'Atención');
         router.navigate(['auth/login']);
+        return throwError(() => error);
       }
 
-      // Lanza el error para que el componente pueda manejarlo si es necesario
       return throwError(() => error);
     })
   );

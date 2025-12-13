@@ -9,10 +9,10 @@ import { take, takeUntil } from 'rxjs';
 import { HeaderComponent } from '../../../../shared/header/header.component';
 import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
 import { ChatService } from '../../services/chat/chat.service';
-import { AuthService } from '../../../auth/services/auth/auth.service';
 import { Message } from '../../models/message/messages';
 import { config } from '../../../../config/config';
-import { User } from '../../../../core/models/user/user';
+import { User } from '../../../../core/domain/auth/models/auth.model';
+import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
 @Component({
   selector: 'app-chat-room',
   imports: [
@@ -39,7 +39,7 @@ export class ChatRoomComponent implements OnDestroy {
   roomId: number = -1;
   usersInRoom: number = 1;
   showTypingGif = false;
-  constructor(private route: ActivatedRoute, public auth: AuthService, private _chatService: ChatService) {
+  constructor(private route: ActivatedRoute, public auth: AuthManagementService, private _chatService: ChatService) {
     this.route.params.pipe(
       take(1)
     )
@@ -78,7 +78,7 @@ export class ChatRoomComponent implements OnDestroy {
           if (this.isTyping()) {
             this.isTyping.set(false);
             this._chatService
-              .sendTypingEvent(this.roomId, this.isTyping(), this.auth.userData().id)
+              .sendTypingEvent(this.roomId, this.isTyping(), this.auth.userDataValue()!.id)
               .pipe(
                 take(1)
               ).subscribe({
@@ -94,7 +94,7 @@ export class ChatRoomComponent implements OnDestroy {
   onInput() {
     if (!this.isTyping()) {
       this.isTyping.set(true);
-      this._chatService.sendTypingEvent(this.roomId, this.isTyping(), this.auth.userData().id).pipe(
+      this._chatService.sendTypingEvent(this.roomId, this.isTyping(), this.auth.userDataValue()!.id).pipe(
         take(1)
       ).subscribe();
     }
@@ -125,7 +125,7 @@ export class ChatRoomComponent implements OnDestroy {
       } else {
         data['chat'].status = 'delivered';
       }
-      if (data['chat'].sender_id === this.auth.userData().id) {
+      if (data['chat'].sender_id === this.auth.userDataValue()!.id) {
         this.updateListMessage(data['chat'], true);
       } else {
         this.updateListMessage(data['chat']);
@@ -143,7 +143,7 @@ export class ChatRoomComponent implements OnDestroy {
     });
     channel.listen('.user-typing', (data: any) => {
       debugger;
-      if (data.idUserTyping != this.auth.userData().id) {
+      if (data.idUserTyping != this.auth.userDataValue()!.id) {
         this.showTypingGif = data.isTyping;
       }
     });
@@ -206,7 +206,7 @@ export class ChatRoomComponent implements OnDestroy {
       id: Date.now(),
       tempId: tempId,
       message: message,
-      sender_id: this.auth.userData().id,
+      sender_id: this.auth.userDataValue()!.id,
       receiver_id: -1,
       status: 'sent',
       read_at: '',

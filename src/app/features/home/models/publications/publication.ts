@@ -1,5 +1,5 @@
 import { Comment } from "../comments/comment";
-import { User } from "../../../../core/models/user/user";
+import { User } from "../../../../core/domain/auth/models/auth.model";
 
 export interface Publication {
     id: number;

@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { JsonPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../auth/services/auth/auth.service';
 import { ChatService } from '../../services/chat/chat.service';
 import { take } from 'rxjs';
+import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
 
 @Component({
   selector: 'app-list-friends',
@@ -14,7 +14,7 @@ import { take } from 'rxjs';
 export class ListFriendsComponent {
 
   listUserChatted = signal<any>({});
-  constructor(public auth: AuthService, private _chatService: ChatService) {
+  constructor(public auth: AuthManagementService, private _chatService: ChatService) {
     this._chatService.getDataUserChatted().pipe(
       take(1)
     ).subscribe({

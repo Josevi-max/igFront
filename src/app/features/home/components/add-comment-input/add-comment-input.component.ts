@@ -2,11 +2,10 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, input, OnChanges, OnInit, sig
 import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
 import { HomeService } from '../../services/home/home.service';
 import { CommentaryService } from '../../services/commment/commentary.service';
-import { AuthService } from '../../../auth/services/auth/auth.service';
-import { Publication } from '../../models/publications/publication';
 import { FormsModule } from '@angular/forms';
 import { Comment } from '../../models/comments/comment';
 import { take } from 'rxjs';
+import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
 
 @Component({
   selector: 'app-add-comment-input',
@@ -16,7 +15,7 @@ import { take } from 'rxjs';
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AddCommentInputComponent implements OnChanges {
-  constructor(private homeService: HomeService, private commentaryService: CommentaryService, public authService: AuthService) { }
+  constructor(private homeService: HomeService, private commentaryService: CommentaryService, public authManagementService: AuthManagementService) { }
   @Input() cardData: any;
   @Input() isModalSection: boolean = false;
   @Input() isReply: boolean = false;
@@ -63,7 +62,7 @@ export class AddCommentInputComponent implements OnChanges {
           next: (response) => {
             this.loadingNewComment(false, idPublication);
             if (this.commentaryService.idCommentWeAreReplying() == -1) {
-              response.data.user = this.authService.userData();
+              response.data.user = this.authManagementService.userDataValue();
               this.updateDataSignal(idPublication, response.data);
             }
             valueTextArea.value = '';
@@ -129,7 +128,7 @@ export class AddCommentInputComponent implements OnChanges {
       next: (response) => {
         this.loadingNewComment(false, idPublication);
         let valueTextArea = document.getElementById(`commentModal${idPublication}`) as HTMLInputElement;
-        response.data.user = this.authService.userData();
+        response.data.user = this.authManagementService.userDataValue();
         this.commentaryService.updateListOfReplies(response.data);
         this.commentaryService.listOfComments.update((data: any) => {
           return [...data, response.data];

@@ -4,7 +4,7 @@ import { Observable, take } from 'rxjs';
 import { config } from '../../../../config/config';
 import { Comment } from '../../models/comments/comment';
 import { HomeService } from '../home/home.service';
-import { AuthService } from '../../../auth/services/auth/auth.service';
+import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,7 @@ export class CommentaryService {
 
   http = inject(HttpClient);
   homeService = inject(HomeService);
-  authService = inject(AuthService);
+  authManagementService = inject(AuthManagementService);
   idCommentWeAreReplying = signal<number>(-1);
   idCommentsWithReply = signal<number[]>([]);
   listOfReplies = signal<Comment[]>([]);
@@ -47,7 +47,7 @@ export class CommentaryService {
     this.listOfComments.update((comments: Comment[]) => {
       return comments.map((comment: Comment) => {
         if (comment.id == commentId) {
-          comment.likes.push({ user_id: this.authService.userData().id });
+          comment.likes.push({ user_id: this.authManagementService.userDataValue()?.id });
           comment.is_liked = true;
         }
         return comment;
@@ -57,7 +57,7 @@ export class CommentaryService {
       this.listOfReplies.update((comments: Comment[]) => {
         return comments.map((comment: Comment) => {
           if (comment.id == commentId) {
-            comment.likes.push({ user_id: this.authService.userData().id });
+            comment.likes.push({ user_id: this.authManagementService.userDataValue()?.id });
             comment.is_liked = true;
           }
           return comment;
@@ -91,7 +91,7 @@ export class CommentaryService {
     this.listOfComments.update((comments: Comment[]) => {
       return comments.map((comment: Comment) => {
         if (comment.id == commentId) {
-          comment.likes = comment.likes.filter((like: any) => like.user_id != this.authService.userData().id);
+          comment.likes = comment.likes.filter((like: any) => like.user_id != this.authManagementService.userDataValue()?.id);
           comment.is_liked = false;
         }
         return comment;
@@ -101,7 +101,7 @@ export class CommentaryService {
       this.listOfReplies.update((comments: Comment[]) => {
         return comments.map((comment: Comment) => {
           if (comment.id == commentId) {
-            comment.likes = comment.likes.filter((like: any) => like.user_id != this.authService.userData().id);
+            comment.likes = comment.likes.filter((like: any) => like.user_id != this.authManagementService.userDataValue()?.id);
             comment.is_liked = false;
           }
           return comment;

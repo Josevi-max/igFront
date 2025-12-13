@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { config } from '../../../../config/config';
 import { Observable } from 'rxjs';
-import { AuthService } from '../../../auth/services/auth/auth.service';
+import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
 
 
 @Injectable({
@@ -11,7 +11,7 @@ import { AuthService } from '../../../auth/services/auth/auth.service';
 export class ChatService {
 
   http = inject(HttpClient);
-  _authService = inject(AuthService);
+  _authManagementService = inject(AuthManagementService);
   dataActualUser = signal({});
 
 
@@ -24,7 +24,7 @@ export class ChatService {
   }
 
   getDataUserChatted():Observable<any>{
-    return this.http.get(config.api.URL_BACKEND + '/chat/get-list-user-with-chats/' + this._authService.userData().id);
+    return this.http.get(config.api.URL_BACKEND + '/chat/get-list-user-with-chats/' + this._authManagementService.userDataValue()?.id);
   }
 
   getInfoUserChat(idUser:number):Observable<any>{
@@ -34,7 +34,7 @@ export class ChatService {
   sendMessage(myMessage: string, receiverId: number, tempId:string): Observable<any> {
     return this.http.post(config.api.URL_BACKEND + '/chat/send-message', {
       'message': myMessage,
-      'sender_id': this._authService.userData().id,
+      'sender_id': this._authManagementService.userDataValue()?.id,
       'receiver_id': receiverId,
       'tempId' : tempId
     });
@@ -53,7 +53,7 @@ export class ChatService {
 
   getOrCreateRoom(idFriend: number): Observable<any> {
     return this.http.post(config.api.URL_BACKEND + '/chat/create-room/', {
-      'sender_id': this._authService.userData().id,
+      'sender_id': this._authManagementService.userDataValue()?.id,
       'receiver_id': idFriend
     });
   }

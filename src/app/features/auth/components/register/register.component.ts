@@ -1,11 +1,8 @@
-import { Component, input } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ToastrService } from 'ngx-toastr';
-import { AuthService } from '../../services/auth/auth.service';
-import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
-import { take } from 'rxjs';
+import { AuthFacadeService } from '../../../../core/state/auth/facade/auth-facade.service';
 
 @Component({
   selector: 'app-register',
@@ -13,15 +10,16 @@ import { take } from 'rxjs';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule,
-    SpinnerComponent
+    RouterModule
   ],
   
   templateUrl: './register.component.html',
   styleUrl: './register.component.less'
 })
 export class RegisterComponent {
-  registerForm = new FormGroup({
+  private readonly authFacade = inject(AuthFacadeService);
+
+  public registerForm:FormGroup = new FormGroup({
     email: new FormControl('', [
       Validators.required,
       Validators.email
@@ -43,34 +41,9 @@ export class RegisterComponent {
       ]
     ),
   });
-  loading = false;
-  constructor(private router: Router, private _authService: AuthService, private toastr: ToastrService) {
 
-  }
+  public passwordFieldType = this.authFacade.passwordVisibility;
 
-
-
-  registerUser() {
-    if (this.registerForm.valid) {
-      this.loading = true;
-      this._authService.register(this.registerForm.value).pipe(
-              take(1)
-            )
-            .subscribe(
-        (response) => {
-          this.toastr.info('¡Usuario registrado, redirigiendo al login!', 'Éxito');
-          this.router.navigate(['auth/login']);
-          this.loading = false;
-        },
-        (error) => {
-          console.log(error);
-          this.toastr.error(error.error, 'Error');
-          this.loading = false;
-        }
-      );
-    }
-
-  }
 
   get emailInvalid(): boolean {
     const emailControl = this.registerForm.get('email');
@@ -92,15 +65,13 @@ export class RegisterComponent {
     return Boolean(usernameControl?.touched && (usernameControl?.hasError('required') || usernameControl?.hasError('minlength')));
   }
 
-
-  showPassword(){
-    let input = document.querySelector('input[name="password"]') as HTMLInputElement;
-    let typeInput = input?.type;
-    if(typeInput == 'password'){
-      input.type = 'text';
+  public registerUser():void {
+    if (this.registerForm.valid) {
+      this.authFacade.register(this.registerForm.value);
     }
-    if(typeInput == 'text'){
-      input.type = 'password';
-    } 
+  }
+
+  public showHidePassword():void {
+    this.authFacade.tooglePassword();
   }
 }

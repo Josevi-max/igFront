@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './features/auth/guards/auth/auth.guard';
+import { AuthGuard } from './core/infrastructure/guards/auth/auth.guard';
 import { HomeComponent } from './features/home/components/home/home.component';
 import { NotFoundComponent } from './features/errors/components/not-found/not-found.component';
 
