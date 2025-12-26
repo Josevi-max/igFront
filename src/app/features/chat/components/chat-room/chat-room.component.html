@@ -9,7 +9,7 @@
     <div class="position-absolute headerChat">
         <div class="userData">
             <i class="fa-solid fa-circle-user"></i>
-            <span>{{this.dataFriend()?.username}}</span>
+            <span>{{this.dataFriend()?.data?.username}}</span>
         </div>
         <div class="otherIcons">
             <svg aria-label="Información de la conversación" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor"
@@ -25,15 +25,18 @@
             </svg>
         </div>
     </div>
-    <div class="containerChat" (click)="hideAllEmoyiPickers($event)">
+    <div class="containerChat" (click)="hideAllEmoyiPickers()">
         <div class="chat text-center">
-            <div class="typing-indicator ms-2 mt-2" *ngIf="showTypingGif">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            @if(showTypingGif()){
+                <div class="typing-indicator ms-2 mt-2">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            }
+            
             <div *ngFor="let message of this.messages()">
-                @if(message.sender_id == idFriend){
+                @if(message.sender_id == dataFriend()?.data!.id) {
                 <div class="containerMyFriendMessage">
                     <div class="MyfriendMessage">
                         <i class="fa-solid fa-circle-user"></i>
@@ -51,7 +54,7 @@
 
                         </p>
                     </div>
-                    <i *ngIf="message.status == 'sent'" class="fa-solid fa-paper-plane"></i>
+                    <i *ngIf="message.status === MessageStatus.SENT" class="fa-solid fa-paper-plane"></i>
                 </div>
 
                 }
@@ -68,7 +71,7 @@
                         d="M15.83 10.997a1.167 1.167 0 1 0 1.167 1.167 1.167 1.167 0 0 0-1.167-1.167Zm-6.5 1.167a1.167 1.167 0 1 0-1.166 1.167 1.167 1.167 0 0 0 1.166-1.167Zm5.163 3.24a3.406 3.406 0 0 1-4.982.007 1 1 0 1 0-1.557 1.256 5.397 5.397 0 0 0 8.09 0 1 1 0 0 0-1.55-1.263ZM12 .503a11.5 11.5 0 1 0 11.5 11.5A11.513 11.513 0 0 0 12 .503Zm0 21a9.5 9.5 0 1 1 9.5-9.5 9.51 9.51 0 0 1-9.5 9.5Z">
                     </path>
                 </svg>
-                <emoji-picker class="d-none" id="emoyiPicker" (emoji-click)="addEmoji($event)"></emoji-picker>
+                <emoji-picker [class]="showEmoyiPicker() ? '' : 'd-none'" id="emoyiPicker" (emoji-click)="addEmoji($event)"></emoji-picker>
                 <input type="text" class="form-control" name="myMessage" (input)="onInput()" [(ngModel)]="textMessage"
                     placeholder="Envía un mensaje...">
                 @if(textMessage==undefined || textMessage=='') {

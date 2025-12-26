@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, signal, Signal, effect, OnDestroy } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, signal, Signal, effect, OnDestroy, WritableSignal, DestroyRef, inject } from '@angular/core';
 import { ActivatedRoute, Route } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ListFriendsComponent } from '../list-friends/list-friends.component';
@@ -13,6 +13,11 @@ import { Message } from '../../models/message/messages';
 import { config } from '../../../../config/config';
 import { User } from '../../../../core/domain/auth/models/auth.model';
 import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChatFacadeService } from '../../state/facade/chat-facade.service';
+import { ChatStoreService } from '../../state/store/chat-store.service';
+import { ApiResponseDto, UserApiDto } from '../../infrastructure/models/chat-user.dto';
+import { MessageStatus } from '../../domain/models/chat.model';
 @Component({
   selector: 'app-chat-room',
   imports: [
@@ -28,252 +33,204 @@ import { AuthManagementService } from '../../../../core/state/auth/store/auth-ma
 })
 export class ChatRoomComponent implements OnDestroy {
 
-  onDestroy = signal<any>(false);
-  textMessage: string = '';
-  idFriend: number = -1;
-  loading = true;
-  messages = signal<Message[]>([]);
-  isTyping = signal<boolean>(false);
-  dataFriend = signal<User | undefined>(undefined);
-  echo: any;
-  roomId: number = -1;
-  usersInRoom: number = 1;
-  showTypingGif = false;
-  constructor(private route: ActivatedRoute, public auth: AuthManagementService, private _chatService: ChatService) {
+  public auth = inject(AuthManagementService);
+  public textMessage: string = '';
+  public loading: boolean = false;
+  public messages: Signal<Message[]> = signal([]);
+  public isTyping: Signal<boolean> = signal(false);
+  public dataFriend: Signal<ApiResponseDto<UserApiDto> | undefined> = signal(undefined);
+  public echo: Echo<'pusher'> | undefined = undefined;
+  public usersInRoom: Signal<number> = signal(1);
+  public showTypingGif: Signal<boolean> = signal(false);
+  public showEmoyiPicker: WritableSignal<boolean> = signal(false);
+  public MessageStatus = MessageStatus;
+  private readonly chatFacadeService = inject(ChatFacadeService);
+  private readonly chatmanagementService = inject(ChatStoreService);
+  private readonly route = inject(ActivatedRoute);
+  private typingTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly TYPING_INACTIVITY_MS = 2000;
+
+  constructor() {
+    this.isTyping = this.chatmanagementService.getIsTyping();
+    this.dataFriend = this.chatmanagementService.getDataFriend();
+    this.messages = this.chatmanagementService.getMessages();
+    this.showTypingGif = this.chatmanagementService.getShowTypingGif();
+    this.usersInRoom = this.chatmanagementService.getUsersInRoom();
+
     this.route.params.pipe(
       take(1)
     )
       .subscribe(
         params => {
-          this.loading = true;
-          const id = params['id'];
-          this.idFriend = id;
-          this.getMessagesChat();
-          this._chatService.getInfoUserChat(this.idFriend).pipe(
-            take(1)
-          )
-            .subscribe(
-              (response) => {
-                this.dataFriend.set(response.data);
-                this.loading = false
-              },
-              takeUntil(this.onDestroy())
-            )
-          this._chatService.getOrCreateRoom(this.idFriend).pipe(
-            take(1)
-          )
-            .subscribe(
-              (response) => {
-                this.roomId = response.data['roomId'];
-                this.joinRoom();
-              },
-              takeUntil(this.onDestroy())
-            )
-        },
-        takeUntil(this.onDestroy())
+          const idFriend = params['id'];
+          this.chatFacadeService.loadInfoUserChat(idFriend);
+          this.chatFacadeService.getListMessages(idFriend);
+          this.chatFacadeService.loadRoomOrCreateIfNotExists(idFriend);
+        }
       );
-    effect(() => {
-      if (this.isTyping()) {
-        setTimeout(() => {
-          if (this.isTyping()) {
-            this.isTyping.set(false);
-            this._chatService
-              .sendTypingEvent(this.roomId, this.isTyping(), this.auth.userDataValue()!.id)
-              .pipe(
-                take(1)
-              ).subscribe({
-                next: () => console.log('Evento de detención de escritura enviado'),
-                error: (err) => console.error('Error al enviar el evento:', err)
-              });
-          }
-        }, 2000);
-      }
-    });
+  }
+
+  ngOnDestroy(): void {
+    this.chatFacadeService.leacheChatRoom();
+    if (this.typingTimer) {
+      clearTimeout(this.typingTimer);
+      this.typingTimer = null;
+      this.chatFacadeService.updateTypingStatus(false);
+    }
+    // if (this.echo) {
+    //   this.echo.leaveChannel(`chat.${this.roomId}`);
+    // }
   }
 
   onInput() {
     if (!this.isTyping()) {
-      this.isTyping.set(true);
-      this._chatService.sendTypingEvent(this.roomId, this.isTyping(), this.auth.userDataValue()!.id).pipe(
-        take(1)
-      ).subscribe();
+      this.chatFacadeService.updateTypingStatus(true);
     }
+    if (this.typingTimer) {
+      clearTimeout(this.typingTimer);
+    }
+    this.typingTimer = setTimeout(() => {
+      this.chatFacadeService.updateTypingStatus(false);
+      this.typingTimer = null;
+    }, this.TYPING_INACTIVITY_MS);
   }
 
 
-  joinRoom() {
-    console.log(this.messages());
-    Pusher.logToConsole = true;
-    let channelName = `chat.${this.roomId}`;
-    this.echo = new Echo({
-      broadcaster: 'pusher',
-      key: config.pusher.key,
-      cluster: config.pusher.cluster,
-      auth: {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      },
-      authEndpoint: config.api.URL_BACKEND_BASE + '/broadcasting/auth',
-    });
+  // joinRoom() {
+  //   this.chatFacadeService.joinToRoom();
+  // console.log(this.messages());
+  // Pusher.logToConsole = true;
+  // let channelName = `chat.${this.roomId}`;
+  // this.echo = new Echo({
+  //   broadcaster: 'pusher',
+  //   key: config.pusher.key,
+  //   cluster: config.pusher.cluster,
+  //   auth: {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem('token')}`,
+  //     },
+  //   },
+  //   authEndpoint: config.api.URL_BACKEND_BASE + '/broadcasting/auth',
+  // });
 
-    const channel = this.echo.join(channelName);
+  // const channel = this.echo.join(channelName);
 
-    channel.listen('.new-chat-message', (data: any) => {
-      if (this.usersInRoom > 1) {
-        data['chat'].status = 'read';
-      } else {
-        data['chat'].status = 'delivered';
-      }
-      if (data['chat'].sender_id === this.auth.userDataValue()!.id) {
-        this.updateListMessage(data['chat'], true);
-      } else {
-        this.updateListMessage(data['chat']);
-      }
+  // channel.listen('.new-chat-message', (data: any) => {
+  //   if (this.usersInRoom > 1) {
+  //     data['chat'].status = 'read';
+  //   } else {
+  //     data['chat'].status = 'delivered';
+  //   }
+  //   if (data['chat'].sender_id === this.auth.userDataValue()!.id) {
+  //     this.updateListMessage(data['chat'], true);
+  //   } else {
+  //     this.updateListMessage(data['chat']);
+  //   }
 
-      this._chatService.changeStatusMessage(data['chat'].status, data['chat'].id).pipe(
-        take(1)
-      ).subscribe(
-        (data: any) => {
-          console.log(data);
-        }, (error) => {
-          console.log(error);
-        }
-      )
-    });
-    channel.listen('.user-typing', (data: any) => {
-      debugger;
-      if (data.idUserTyping != this.auth.userDataValue()!.id) {
-        this.showTypingGif = data.isTyping;
-      }
-    });
-    channel.here((users: any[]) => {
-      this.usersInRoom = users.length;
-      if (this.usersInRoom > 1) {
-        this._chatService.changeStatusMessage('read').pipe(
-          take(1)
-        ).subscribe(
-          (data: any) => {
-            console.log(data);
-          }, (error) => {
-            console.log(error);
-          }
-        )
-      }
-      console.log('Usuarios conectados:', users);
-    });
+  //   this._chatService.changeStatusMessage(data['chat'].status, data['chat'].id).pipe(
+  //     take(1)
+  //   ).subscribe(
+  //     (data: any) => {
+  //       console.log(data);
+  //     }, (error) => {
+  //       console.log(error);
+  //     }
+  //   )
+  // });
+  // channel.listen('.user-typing', (data: any) => {
+  //   debugger;
+  //   if (data.idUserTyping != this.auth.userDataValue()!.id) {
+  //     this.showTypingGif = data.isTyping;
+  //   }
+  // });
+  // channel.here((users: any[]) => {
+  //   this.usersInRoom = users.length;
+  //   if (this.usersInRoom > 1) {
+  //     this._chatService.changeStatusMessage('read').pipe(
+  //       take(1)
+  //     ).subscribe(
+  //       (data: any) => {
+  //         console.log(data);
+  //       }, (error) => {
+  //         console.log(error);
+  //       }
+  //     )
+  //   }
+  //   console.log('Usuarios conectados:', users);
+  // });
 
-    channel.joining((user: any) => {
-      this.usersInRoom++;
-      this._chatService.changeStatusMessage('read').pipe(
-        take(1)
-      ).subscribe(
-        (data: any) => {
-          console.log(data);
-        }, (error) => {
-          console.log(error);
-        }
-      )
-      console.log('Usuario uniéndose:', user);
-    });
+  // channel.joining((user: any) => {
+  //   this.usersInRoom++;
+  //   this._chatService.changeStatusMessage('read').pipe(
+  //     take(1)
+  //   ).subscribe(
+  //     (data: any) => {
+  //       console.log(data);
+  //     }, (error) => {
+  //       console.log(error);
+  //     }
+  //   )
+  //   console.log('Usuario uniéndose:', user);
+  // });
 
-    channel.leaving((user: any) => {
-      this.usersInRoom--;
-      console.log('Usuario abandonando:', user);
-    });
-  }
+  // channel.leaving((user: any) => {
+  //   this.usersInRoom--;
+  //   console.log('Usuario abandonando:', user);
+  // });
+  // }
 
   createComment() {
     if (this.textMessage != '') {
-      var tempId: string = Math.random().toString(36).substr(2, 9);
-      this.addTemporalCopy(this.textMessage, tempId);
-      let valueMessage = this.textMessage;
+      this.chatFacadeService.createMessage(this.textMessage);
       this.textMessage = '';
-      this._chatService.sendMessage(valueMessage, this.idFriend, tempId).pipe(
-        take(1)
-      ).subscribe(
-        (data: any) => {
-          console.log(data);
-        }, (error) => {
-          console.log(error);
-        }
-      )
     }
   }
 
-  addTemporalCopy(message: string, tempId: string) {
-    let chat: Message = {
-      id: Date.now(),
-      tempId: tempId,
-      message: message,
-      sender_id: this.auth.userDataValue()!.id,
-      receiver_id: -1,
-      status: 'sent',
-      read_at: '',
-      created_at: new Date().toString(),
-      updated_at: new Date().toString()
-    }
-    this.updateListMessage(chat);
-  }
+  // addTemporalCopy(message: string, tempId: string) {
+  //   let chat: Message = {
+  //     id: Date.now(),
+  //     tempId: tempId,
+  //     message: message,
+  //     sender_id: this.auth.userDataValue()!.id,
+  //     receiver_id: -1,
+  //     status: 'sent',
+  //     read_at: '',
+  //     created_at: new Date().toString(),
+  //     updated_at: new Date().toString()
+  //   }
+  //   this.updateListMessage(chat);
+  // }
 
-  getMessagesChat() {
-    return this._chatService.getMessagesChat(this.idFriend).pipe(
-      take(1)
-    ).subscribe(
-      (data: any) => {
-        this.messages.set(data.response);
-      }, (error) => {
-        console.log(error);
-      }
-    )
-  }
-
-  updateListMessage(newMessage: Message, searchAndReplaceWithTempId = false) {
-    if (!searchAndReplaceWithTempId) {
-      this.messages.update(msgs => [newMessage, ...msgs]);
-      let chatElement = document.getElementsByClassName('chat');
-      chatElement[0].scrollTop = chatElement[0].scrollHeight;
-    } else {
-      this.messages.update((msgs: any[]) => {
-        return msgs.map(msg => {
-          if (msg.tempId == newMessage.tempId) {
-            return newMessage;
-          } else {
-            return msg;
-          }
-        });
-      });
-      debugger;
-      let chatElement = document.getElementsByClassName('chat');
-      chatElement[0].scrollTop = chatElement[0].scrollHeight;
-    }
-  }
+  // updateListMessage(newMessage: Message, searchAndReplaceWithTempId = false) {
+  //   if (!searchAndReplaceWithTempId) {
+  //     this.messages.update(msgs => [newMessage, ...msgs]);
+  //     let chatElement = document.getElementsByClassName('chat');
+  //     chatElement[0].scrollTop = chatElement[0].scrollHeight;
+  //   } else {
+  //     this.messages.update((msgs: any[]) => {
+  //       return msgs.map(msg => {
+  //         if (msg.tempId == newMessage.tempId) {
+  //           return newMessage;
+  //         } else {
+  //           return msg;
+  //         }
+  //       });
+  //     });
+  //     debugger;
+  //     let chatElement = document.getElementsByClassName('chat');
+  //     chatElement[0].scrollTop = chatElement[0].scrollHeight;
+  //   }
+  // }
 
   addEmoji(event: any) {
     this.textMessage += event.detail.unicode;
   }
 
-  hideAllEmoyiPickers(event: Event) {
-    if ((event.target as HTMLElement).closest('#emoyiPicker, input, .emoyiInputIcon')) {
-      return;
-    }
-    let emoyiPicker = document.getElementById('emoyiPicker') as HTMLElement;
-    emoyiPicker.classList.add('d-none');
+  hideAllEmoyiPickers() {
+    this.showEmoyiPicker.set(false);
   }
 
   showHideEmoyi() {
-    let emoyiPicker = document.getElementById('emoyiPicker') as HTMLElement;
-    if (emoyiPicker.classList.contains('d-none')) {
-      emoyiPicker.classList.remove('d-none')
-    } else {
-      emoyiPicker.classList.add('d-none')
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.onDestroy.set(true);
-    if (this.echo) {
-      this.echo.leaveChannel(`chat.${this.roomId}`);
-    }
+    this.showEmoyiPicker.set(!this.showEmoyiPicker());
   }
 }
