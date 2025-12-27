@@ -8,7 +8,6 @@ export class ChatAdaptersService {
 
   public sendTypingEventAdapter(roomId:number,isUserTyping:boolean,idUserTyping:number):HttpParams{
     let params = new HttpParams();
-    debugger;
     params = params.set('roomId', roomId);
     params = params.set('isUserTyping', isUserTyping);
     params = params.set('idUserTyping', idUserTyping);

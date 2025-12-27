@@ -74,7 +74,6 @@ export class CommentaryService {
         },
         error: (error) => {
           this.pendingLikes.delete(commentId);
-          debugger;
           if (error.status == 400 && error.error.message == "You have already liked this commentary") {
             this.removeLikeComment(commentId);
           }

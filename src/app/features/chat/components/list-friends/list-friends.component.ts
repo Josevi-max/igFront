@@ -1,30 +1,24 @@
-import { Component, signal } from '@angular/core';
-import { JsonPipe } from '@angular/common';
+import { Component, inject, Signal, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ChatService } from '../../services/chat/chat.service';
-import { take } from 'rxjs';
 import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
+import { UserApiDto } from '../../infrastructure/models/chat-user.dto';
+import { ChatStoreService } from '../../state/store/chat-store.service';
 
 @Component({
   selector: 'app-list-friends',
-  imports: [JsonPipe, RouterModule],
+  imports: [RouterModule],
   templateUrl: './list-friends.component.html',
   styleUrl: './list-friends.component.less'
 })
 export class ListFriendsComponent {
 
-  listUserChatted = signal<any>({});
-  constructor(public auth: AuthManagementService, private _chatService: ChatService) {
-    this._chatService.getDataUserChatted().pipe(
-      take(1)
-    ).subscribe({
-      next: (response) => {
-        this.listUserChatted.set(response.data);
-      },
-      error: (error) => {
-        console.log(error);
-      }
-    })
+  public listUserChatted: Signal<UserApiDto[] | undefined> = signal(undefined);
+  public usernameLogged: Signal<string | undefined> = signal(undefined);
+  private readonly chatManagementService = inject(ChatStoreService);
+  private readonly authManagementService = inject(AuthManagementService);
+  constructor() {
+    this.listUserChatted = this.chatManagementService.getListUserChatted();
+    this.usernameLogged = signal(this.authManagementService.userDataValue()?.username);
   }
 
 }

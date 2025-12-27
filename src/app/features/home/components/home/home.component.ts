@@ -55,7 +55,6 @@ export class HomeComponent implements OnInit {
       take(1)
     ).subscribe(
       (response) => {
-        debugger;
         console.log(response.response.data);
         this.homeService.data.set(response.response.data);
       }

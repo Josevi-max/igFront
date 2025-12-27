@@ -6,5 +6,7 @@ export const chatRoomResolver: ResolveFn<void> = (route, state) => {
   const idUser = Number(route.paramMap.get('id'));
   const chatFacadeService = inject(ChatFacadeService);
   chatFacadeService.loadInfoUserChat(idUser);
+  chatFacadeService.getListMessages(idUser);
   chatFacadeService.loadRoomOrCreateIfNotExists(idUser);
+  chatFacadeService.getDataUserChatted();
 };

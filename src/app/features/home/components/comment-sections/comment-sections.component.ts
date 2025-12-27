@@ -1,5 +1,4 @@
-import { JsonPipe } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, QueryList, signal, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { AddCommentInputComponent } from '../add-comment-input/add-comment-input.component';
 import { HomeService } from '../../services/home/home.service';
 import { CommentaryService } from '../../services/commment/commentary.service';
@@ -9,7 +8,7 @@ import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
 
 @Component({
   selector: 'app-comment-sections',
-  imports: [AddCommentInputComponent, JsonPipe, CommentBoxComponent, SpinnerComponent],
+  imports: [AddCommentInputComponent, CommentBoxComponent, SpinnerComponent],
   templateUrl: './comment-sections.component.html',
   styleUrl: './comment-sections.component.less'
 })

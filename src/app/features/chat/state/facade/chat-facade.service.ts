@@ -1,11 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { ChatApiService } from '../../infrastructure/api/chat-api.service';
-import { take, timeout } from 'rxjs';
+import { take } from 'rxjs';
 import { ChatStoreService } from '../store/chat-store.service';
 import { ChatRealtimeService } from '../../domain/chat-realtime.service';
 import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
-import { ChannelsListened, MessageStatus } from '../../domain/models/chat.model';
-import { Message } from '../../models/message/messages';
+import { MessageStatus } from '../../domain/models/chat.model';
+import { UserApi } from '../../../../core/infrastructure/api/auth/auth-response.dto';
+import { NewMessageApiDto, TypingResponse, ChannelsListened, Message } from '../../infrastructure/models/chat-user.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,6 @@ export class ChatFacadeService {
   public loadInfoUserChat(idUser: number): void {
     this.chatApiService.getInfoUserChat(idUser).pipe(take(1)).subscribe(
       (user) => {
-        debugger;
         this.chatStoreService.setDataFriend(user);
       }
     );
@@ -29,8 +29,10 @@ export class ChatFacadeService {
   public loadRoomOrCreateIfNotExists(idUser: number): void {
     this.chatApiService.getOrCreateRoom(idUser).pipe(take(1)).subscribe(
       (response) => {
-        this.chatStoreService.setRoomId(response.data['roomId']);
-        this.joinToRoom();
+        if(response.data){
+          this.chatStoreService.setRoomId(response.data['roomId']);
+          this.joinToRoom();
+        }
       }
     );
   }
@@ -38,44 +40,37 @@ export class ChatFacadeService {
   public joinToRoom(): void {
     const roomId = this.chatStoreService.getRoomId()();
     const channel = this.chatRealtimeService.connect(roomId);
-    channel.listen(`.${ChannelsListened.NEW_MESSAGE}`, (data: any) => {
-      const status = this.chatRealtimeService.processStatusMessage(data);
+    channel.listen(`.${ChannelsListened.NEW_MESSAGE}`, (data: NewMessageApiDto) => {
+      const status = this.chatRealtimeService.processStatusMessage(data.chat.sender_id);
       this.chatApiService.changeStatusMessage(status, data.chat.id).pipe(take(1)).subscribe();
-      debugger;
       if(data.chat.sender_id != this.auth.userDataValue()!.id){
         this.chatStoreService.addMessage(data.chat);
       }else{
         this.chatStoreService.updateStatusMessage(data.chat,status);
       }
+
     });
-    channel.listen(`.${ChannelsListened.USER_TYPING}`, (data: any) => {
-      debugger;
+    channel.listen(`.${ChannelsListened.USER_TYPING}`, (data: TypingResponse) => {
       if (data.idUserTyping != this.auth.userDataValue()!.id) {
-        this.chatStoreService.setShowTypingGif(JSON.parse(data.isTyping));
+        this.chatStoreService.setShowTypingGif(data.isTyping);
       }
     });
-    channel.here((users: any) => {
+    channel.here((users: UserApi[]) => {
       if (users.length > 1) {
         this.chatApiService.changeStatusMessage(MessageStatus.READ).pipe(take(1)).subscribe();
       }
     });
-    channel.joining((user: any) => {
+    channel.joining(() => {
       this.chatStoreService.incrementUsersInRoom();
       this.chatApiService.changeStatusMessage(MessageStatus.READ).pipe(take(1)).subscribe();
     });
-    channel.leaving((user: any) => {
+    channel.leaving(() => {
       this.chatStoreService.decrementUsersInRoom();
     });
   }
 
   public leaveRoom(): void {
     this.chatRealtimeService.disconnect();
-  }
-
-  public leacheChatRoom(): void {
-    const echo = this.chatStoreService.getEcho()();
-    const roomIdStore = this.chatStoreService.getRoomId()();
-    echo!.leaveChannel(`${ChannelsListened.CHAT}.${roomIdStore}`);
   }
 
   public updateTypingStatus(isUserTyping: boolean): void {
@@ -85,18 +80,43 @@ export class ChatFacadeService {
   }
 
   public getListMessages(idUser2: number): void {
-    debugger;
     this.chatApiService.getMessagesChat(idUser2).pipe(take(1)).subscribe(
       (response) => {
-        this.chatStoreService.setMessages(response.response);
+        if(response.data){
+          this.chatStoreService.setMessages(response.data);
+        }
       }
     );
   }
 
   public createMessage(myMessage: string): void {
     const tempId = this.chatRealtimeService.generateTempId();
-    const receiverId = this.chatStoreService.getDataFriend()()?.data.id!;
-    this.chatRealtimeService.addMyMessageToChatList(myMessage, receiverId, tempId);
+    const receiverId = this.chatStoreService.getDataFriend()()?.data!.id!;
+    this.addMyMessageToChatList(myMessage, receiverId, tempId);
     this.chatApiService.sendMessage(myMessage, receiverId, tempId).pipe(take(1)).subscribe();
+  }
+
+  public getDataUserChatted(): void {
+    this.chatApiService.getDataUserChatted().pipe(take(1)).subscribe(
+      (response) => {
+        debugger;
+        this.chatStoreService.setListUserChatted(response.data);
+      }
+    );
+  }
+
+  private addMyMessageToChatList(message: string, receiverId: number, tempId: string): void {
+    const chat: Message = {
+      id: Date.now(),
+      tempId: tempId,
+      message: message,
+      sender_id: this.auth.userDataValue()!.id,
+      receiver_id: receiverId,
+      status: MessageStatus.SENT,
+      read_at: '',
+      created_at: new Date().toString(),
+      updated_at: new Date().toString()
+    }
+    this.chatStoreService.addMessage(chat);
   }
 }

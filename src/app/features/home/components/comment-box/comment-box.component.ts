@@ -1,4 +1,4 @@
-import { Component, Input, input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommentaryService } from '../../services/commment/commentary.service';
 import { HomeService } from '../../services/home/home.service';
 import { Comment } from '../../models/comments/comment';

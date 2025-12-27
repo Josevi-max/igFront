@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import Echo from 'laravel-echo';
 import { config } from '../../../config/config';
 import { AuthManagementService } from '../../../core/state/auth/store/auth-management.service';
-import { Message, MessageStatus } from './models/chat.model';
+import { MessageStatus } from './models/chat.model';
 import { ChatStoreService } from '../state/store/chat-store.service';
 
 @Injectable({
@@ -29,9 +29,9 @@ export class ChatRealtimeService {
     return this.echo.join(`chat.${roomId}`);
   }
 
-  public processStatusMessage(data: any): MessageStatus {
+  public processStatusMessage(senderId: number): MessageStatus {
     let result = MessageStatus.DELIVERED
-    if (data['chat'].sender_id === this.authService.userDataValue()!.id) {
+    if (senderId === this.authService.userDataValue()!.id) {
       result = MessageStatus.READ;
     }
     return result;
@@ -43,20 +43,5 @@ export class ChatRealtimeService {
 
   public generateTempId(): string {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  }
-
-  public addMyMessageToChatList(message: string, receiverId: number, tempId: string): void {
-    const chat: Message = {
-      id: Date.now(),
-      tempId: tempId,
-      message: message,
-      sender_id: this.authService.userDataValue()!.id,
-      receiver_id: -1,
-      status: MessageStatus.SENT,
-      read_at: '',
-      created_at: new Date().toString(),
-      updated_at: new Date().toString()
-    }
-    this.chatManagementService.addMessage(chat);
   }
 }
