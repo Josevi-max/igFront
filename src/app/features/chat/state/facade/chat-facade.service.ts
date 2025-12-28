@@ -2,32 +2,42 @@ import { inject, Injectable } from '@angular/core';
 import { ChatApiService } from '../../infrastructure/api/chat-api.service';
 import { take } from 'rxjs';
 import { ChatStoreService } from '../store/chat-store.service';
-import { ChatRealtimeService } from '../../domain/chat-realtime.service';
+import { ChatRealtimeService } from '../../infrastructure/realtime/chat-realtime.service';
 import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
 import { MessageStatus } from '../../domain/models/chat.model';
 import { UserApi } from '../../../../core/infrastructure/api/auth/auth-response.dto';
 import { NewMessageApiDto, TypingResponse, ChannelsListened, Message } from '../../infrastructure/models/chat-user.dto';
+import { UiStoreService } from '../../../../core/state/ui/store/ui-store.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatFacadeService {
 
+
   private readonly chatApiService = inject(ChatApiService);
   private readonly chatStoreService = inject(ChatStoreService);
   private readonly chatRealtimeService = inject(ChatRealtimeService);
+  private readonly uiStoreService = inject(UiStoreService);
+  private readonly autmanagementService = inject(AuthManagementService);
   private readonly auth = inject(AuthManagementService);
 
+  get userId(): number {
+    return this.autmanagementService.userDataValue()!.id;
+  }
+
   public loadInfoUserChat(idUser: number): void {
+    this.uiStoreService.setIsLoading(true);
     this.chatApiService.getInfoUserChat(idUser).pipe(take(1)).subscribe(
       (user) => {
         this.chatStoreService.setDataFriend(user);
+        this.uiStoreService.setIsLoading(false);
       }
     );
   }
 
   public loadRoomOrCreateIfNotExists(idUser: number): void {
-    this.chatApiService.getOrCreateRoom(idUser).pipe(take(1)).subscribe(
+    this.chatApiService.getOrCreateRoom(idUser,this.userId).pipe(take(1)).subscribe(
       (response) => {
         if(response.data){
           this.chatStoreService.setRoomId(response.data['roomId']);
@@ -93,11 +103,11 @@ export class ChatFacadeService {
     const tempId = this.chatRealtimeService.generateTempId();
     const receiverId = this.chatStoreService.getDataFriend()()?.data!.id!;
     this.addMyMessageToChatList(myMessage, receiverId, tempId);
-    this.chatApiService.sendMessage(myMessage, receiverId, tempId).pipe(take(1)).subscribe();
+    this.chatApiService.sendMessage(myMessage, receiverId, tempId, this.userId).pipe(take(1)).subscribe();
   }
 
   public getDataUserChatted(): void {
-    this.chatApiService.getDataUserChatted().pipe(take(1)).subscribe(
+    this.chatApiService.getDataUserChatted(this.userId).pipe(take(1)).subscribe(
       (response) => {
         debugger;
         this.chatStoreService.setListUserChatted(response.data);

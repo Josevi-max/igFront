@@ -13,24 +13,22 @@ export class ChatApiService {
 
   private readonly http = inject(HttpClient);
   private readonly chatAdaptersService = inject(ChatAdaptersService);
-  private readonly _authManagementService = inject(AuthManagementService);
-
 
   public sendTypingEvent(roomId: number, isUserTyping: boolean, idUserTyping: number): Observable<StatusResponseDto> {
     const searchParamsTypingEvent = this.chatAdaptersService.sendTypingEventAdapter(roomId, isUserTyping, idUserTyping);
     return this.http.post<StatusResponseDto>(config.api.URL_BACKEND + '/chat/user-typing', searchParamsTypingEvent);
   }
 
-  public getDataUserChatted(): Observable<ApiResponseDto<UserApiDto[]>> {
-    return this.http.get<ApiResponseDto<UserApiDto[]>>(config.api.URL_BACKEND + '/chat/get-list-user-with-chats/' + this._authManagementService.userDataValue()?.id);
+  public getDataUserChatted(userId:number): Observable<ApiResponseDto<UserApiDto[]>> {
+    return this.http.get<ApiResponseDto<UserApiDto[]>>(config.api.URL_BACKEND + '/chat/get-list-user-with-chats/' + userId);
   }
 
   public getInfoUserChat(idUser: number): Observable<ApiResponseDto<UserApiDto>> {
     return this.http.get<ApiResponseDto<UserApiDto>>(config.api.URL_BACKEND + '/chat/get-info-user/' + idUser);
   }
 
-  public sendMessage(myMessage: string, receiverId: number, tempId: string): Observable<StatusResponseDto> {
-    const searchParamsSendMessage = this.chatAdaptersService.sendMessageAdapter(myMessage, receiverId, this._authManagementService.userDataValue()?.id!, tempId);
+  public sendMessage(myMessage: string, receiverId: number, tempId: string, userId:number): Observable<StatusResponseDto> {
+    const searchParamsSendMessage = this.chatAdaptersService.sendMessageAdapter(myMessage, receiverId, userId, tempId);
     return this.http.post<StatusResponseDto>(config.api.URL_BACKEND + '/chat/send-message', searchParamsSendMessage);
   }
 
@@ -43,8 +41,8 @@ export class ChatApiService {
     return this.http.get<ApiResponseDto<Message[]>>(config.api.URL_BACKEND + '/chat/get-chat-messages/' + userId2);
   }
 
-  public getOrCreateRoom(idFriend: number): Observable<ApiResponseDto<RoomResponseDto>> {
-    const searchParamsGetOrCreateRoom = this.chatAdaptersService.getOrCreateRoomAdapter(idFriend, this._authManagementService.userDataValue()?.id!);
+  public getOrCreateRoom(idFriend: number, userId:number): Observable<ApiResponseDto<RoomResponseDto>> {
+    const searchParamsGetOrCreateRoom = this.chatAdaptersService.getOrCreateRoomAdapter(idFriend, userId);
     return this.http.post<ApiResponseDto<RoomResponseDto>>(config.api.URL_BACKEND + '/chat/create-room/', searchParamsGetOrCreateRoom);
   }
 }

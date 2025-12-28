@@ -1,9 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import Echo from 'laravel-echo';
-import { config } from '../../../config/config';
-import { AuthManagementService } from '../../../core/state/auth/store/auth-management.service';
-import { MessageStatus } from './models/chat.model';
-import { ChatStoreService } from '../state/store/chat-store.service';
+import { config } from '../../../../config/config';
+import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
+import { MessageStatus } from '../../domain/models/chat.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +11,6 @@ export class ChatRealtimeService {
 
   private echo!: Echo<'pusher'>;
   private readonly authService = inject(AuthManagementService);
-  private readonly chatManagementService = inject(ChatStoreService);
   public connect(roomId: number) {
     this.echo = new Echo({
       broadcaster: 'pusher',

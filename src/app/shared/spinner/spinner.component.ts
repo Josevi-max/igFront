@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal, Signal } from '@angular/core';
+import { UiStoreService } from '../../core/state/ui/store/ui-store.service';
 
 @Component({
   selector: 'app-spinner',
@@ -8,4 +9,10 @@ import { Component } from '@angular/core';
 })
 export class SpinnerComponent {
 
+  public isLoading: Signal<boolean> = signal(false);
+  private readonly uiStoreService = inject(UiStoreService);
+
+  constructor() {
+    this.isLoading = this.uiStoreService.getIsLoading();
+  }
 }

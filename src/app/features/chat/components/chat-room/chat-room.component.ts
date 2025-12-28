@@ -9,6 +9,7 @@ import { ChatStoreService } from '../../state/store/chat-store.service';
 import { ApiResponseDto, Message, UserApiDto } from '../../infrastructure/models/chat-user.dto';
 import { MessageStatus } from '../../domain/models/chat.model';
 import { EmojiClickEvent } from 'emoji-picker-element/shared';
+import { UiStoreService } from '../../../../core/state/ui/store/ui-store.service';
 @Component({
   selector: 'app-chat-room',
   imports: [
@@ -25,7 +26,7 @@ import { EmojiClickEvent } from 'emoji-picker-element/shared';
 export class ChatRoomComponent implements OnDestroy {
 
   public textMessage: string = '';
-  public loading: boolean = false;
+  public loading: Signal<boolean> = signal(false);
   public messages: Signal<Message[]> = signal([]);
   public isTyping: Signal<boolean> = signal(false);
   public dataFriend: Signal<ApiResponseDto<UserApiDto> | undefined> = signal(undefined);
@@ -35,6 +36,7 @@ export class ChatRoomComponent implements OnDestroy {
   public MessageStatus = MessageStatus;
   private readonly chatFacadeService = inject(ChatFacadeService);
   private readonly chatmanagementService = inject(ChatStoreService);
+  private readonly uiStoreService = inject(UiStoreService);
   private typingTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly TYPING_INACTIVITY_MS = 2000;
 
@@ -44,6 +46,7 @@ export class ChatRoomComponent implements OnDestroy {
     this.messages = this.chatmanagementService.getMessages();
     this.showTypingGif = this.chatmanagementService.getShowTypingGif();
     this.usersInRoom = this.chatmanagementService.getUsersInRoom();
+    this.loading = this.uiStoreService.getIsLoading();
   }
 
   ngOnDestroy(): void {
