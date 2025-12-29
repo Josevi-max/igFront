@@ -3,7 +3,6 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Observable, take } from 'rxjs';
 import { config } from '../../../../config/config';
 import { Comment } from '../../models/comments/comment';
-import { HomeService } from '../home/home.service';
 import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
 
 @Injectable({
@@ -12,7 +11,6 @@ import { AuthManagementService } from '../../../../core/state/auth/store/auth-ma
 export class CommentaryService {
 
   http = inject(HttpClient);
-  homeService = inject(HomeService);
   authManagementService = inject(AuthManagementService);
   idCommentWeAreReplying = signal<number>(-1);
   idCommentsWithReply = signal<number[]>([]);

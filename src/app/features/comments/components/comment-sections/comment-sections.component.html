@@ -61,7 +61,7 @@
                     </div>
                   </div>
                   <div class="commentFooter">
-                    <span class="time">{{calculateNumberOfDaysFromPublication(dataModal['created_at'])}}</span>
+                    <span class="time">{{this.homeService.getNumberDays(dataModal['created_at'])}}</span>
                   </div>
                 </div>
                 @for (comment of this.commentaryService.listOfComments().slice().reverse(); track $index) {
@@ -98,7 +98,7 @@
                   <div class="mainButtons">
 
                     @if(!dataModal['liked_by_auth_user']){
-                    <svg (click)="addLikePublication(dataModal['id'])" aria-label="Me gusta"
+                    <svg (click)="this.homeService.addLikePublication(dataModal['id'])" aria-label="Me gusta"
                       class="cursor-pointer" fill="currentColor" height="24" role="img" viewBox="0 0 24 24"
                       width="24">
                       <title>Me gusta</title>
@@ -107,7 +107,7 @@
                       </path>
                     </svg>
                     }@else {
-                    <svg aria-label="Ya no me gusta" (click)="removeLikePublication(dataModal['id'])"
+                    <svg aria-label="Ya no me gusta" (click)="this.homeService.removeLikePublication(dataModal['id'])"
                       class="text-danger cursor-pointer" fill="currentColor" height="24" role="img" viewBox="0 0 48 48" width="24">
                       <title>Ya no me gusta</title>
                       <path
@@ -141,7 +141,7 @@
                 </div>
                 <div class="likes">
                   <span class="fw-bold">{{dataModal['likes']}} Me gusta</span>
-                  <p class="time">Hace {{calculateNumberOfDaysFromPublication(dataModal['created_at'])}}</p>
+                  <p class="time">Hace {{this.homeService.getNumberDays(dataModal['created_at'])}}</p>
                 </div>
                 <div class="addCommentSection pe-0">
                   <app-add-comment-input [cardData]="dataModal" [isModalSection]="true"></app-add-comment-input>

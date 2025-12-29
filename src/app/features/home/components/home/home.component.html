@@ -1,9 +1,9 @@
 <div class="d-flex">
     <app-header></app-header>
 
-    <div class="cardContainer  pt-4" (click)="hideAllEmoyiPickers($event)">
-        @if(this.homeService.data().length > 0){
-        <div *ngFor="let cardData of this.homeService.data() " class="w-100 d-flex justify-content-center">
+    <div class="cardContainer  pt-4" (click)="hideAllEmoyiPickers()">
+        @if(listPublications()){
+        <div *ngFor="let cardData of listPublications() " class="w-100 d-flex justify-content-center">
             <div class="card">
                 <div class="d-flex align-items-center dataUser">
                     <i class="fa-solid fa-circle-user"></i>
@@ -13,7 +13,7 @@
                             •
                         </div>
                         <div class="time">
-                            {{this.homeService.getNumberDays(cardData['created_at'])}}
+                            {{calculateNumberOfDaysFromPublication(cardData['created_at'])}}
                         </div>
                     </div>
                 </div>
@@ -25,11 +25,11 @@
                     <circle cx="18" cy="12" r="1.5"></circle>
                 </svg>
 
-                <img src="{{cardData['image']}}" class="card-img-top" alt="...">
+                <img [src]="cardData['image']" class="card-img-top" alt="...">
                 <div class="containerCardBody">
                     <div class="reactionIcons">
                         @if(!cardData['liked_by_auth_user']){
-                        <svg aria-label="Me gusta" (click)="this.homeService.addLikePublication(cardData['id'])"
+                        <svg aria-label="Me gusta" (click)="addLikePublication(cardData['id'])"
                             class="ms-0 likePublication{{cardData['id']}}" fill="currentColor" height="24" role="img"
                             viewBox="0 0 24 24" width="24">
                             <title>Me gusta</title>
@@ -39,7 +39,7 @@
                         </svg>
                         }@else{
                         <svg aria-label="Ya no me gusta"
-                            (click)="this.homeService.removeLikePublication(cardData['id'])" class="ms-0 text-danger"
+                            (click)="removeLikePublication(cardData['id'])" class="ms-0 text-danger"
                             fill="currentColor" height="24" role="img" viewBox="0 0 48 48" width="24">
                             <title>Ya no me gusta</title>
                             <path
@@ -75,12 +75,14 @@
                         {{cardData['likes']}} Me gusta
                     </div>
                     <div class="card-body ps-0 pb-0">
-                        <p class="card-text limitText" id="descriptionPublication{{cardData['id']}}">
+                        <p [ngClass]="{'card-text': !isExpanded(cardData['id']), 'limitText': !isExpanded(cardData['id'])}">
                             <span class="text-white fw-bold">{{cardData['user']['username']}}</span>
                             {{cardData['description']}}
                         </p>
                         <span *ngIf="showMoreTextButton(cardData['description'])"
-                            (click)="showHidedText(cardData['id'],$event)">más</span>
+                            (click)="toggleDescription(cardData['id'])" class="cursor-pointer">
+                            {{ isExpanded(cardData['id']) ? 'menos' : 'más' }}
+                        </span>
                     </div>
                     <div class="myComments">
                         <span ngClass="cursor-pointer" data-bs-toggle="modal"
@@ -88,7 +90,7 @@
                             *ngIf="cardData['comments'].length > 0">Ver los {{cardData['comments'].length}}
                             comentarios</span>
                         <p class="text-white" *ngFor="let comment of myComments(cardData['comments'])">
-                            <span class="fw-bold">{{this.authManagementService.userDataValue()?.username}}</span> {{comment}}
+                            <span class="fw-bold">{{usernameAuthUser}}</span> {{comment}}
                         </p>
                     </div>
                     <div class="position-relative">

@@ -6,6 +6,11 @@ import { Injectable, Signal, signal, WritableSignal } from '@angular/core';
 export class UiStoreService {
 
   private isLoading: WritableSignal<boolean> = signal(false);
+  private showEmoyiPicker: WritableSignal<boolean> = signal(false);
+
+  public getShowEmoyiPicker(): Signal<boolean> {
+    return this.showEmoyiPicker;
+  }
 
   public getIsLoading(): Signal<boolean> {
     return this.isLoading;
@@ -13,5 +18,9 @@ export class UiStoreService {
 
   public setIsLoading(value: boolean): void {
     this.isLoading.set(value);
+  }
+
+  public setShowEmoyiPicker(value: boolean): void {
+    this.showEmoyiPicker.set(value);
   }
 }

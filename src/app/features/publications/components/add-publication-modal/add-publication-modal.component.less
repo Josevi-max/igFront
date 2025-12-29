@@ -1,0 +1,89 @@
+#newPublication {
+
+    .btn.close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 1rem;
+        z-index: 10;
+    }
+
+    .modal-dialog {
+        height: 75%;
+        .modal-content {
+            max-width: 600px;
+            margin: auto;
+            margin-top: 10%;
+            background-color: #000;
+            height: 100%;
+            .modal-header {
+                height: 50px;
+                border-top-right-radius: 1rem;
+                border-top-left-radius: 1rem;
+                border-bottom: none;
+
+                .modal-title {
+                    font-size: 16px;
+                    font-weight: 500;
+                }
+                .controlsHeader {
+                    position: absolute;
+                }
+                .controlsHeader.continue-button {
+                    right: 16px;
+                }
+                svg.controlsHeader{
+                    left: 16px;
+                    cursor: pointer;
+                }
+                .continue-button{
+                    color: #0095f6;
+                    padding: 0;
+                    font-weight: 600;
+                }
+            }
+
+            .modal-body {
+                background-color: #262626;
+                border-bottom-right-radius: 1rem;
+                border-bottom-left-radius: 1rem;
+                p {
+                    font-size: 20px;
+                    margin: 15px 0;
+                }
+                #fileInput {
+                    position: absolute;
+                    left: 0;
+                    height: 100%;
+                    opacity: 0;
+                    cursor: pointer;
+                }
+                button {
+                    background-color: #0095f6;
+                    margin-top: 10px;
+                }
+                .container-buttons-options-image{
+                    position: absolute;
+                    bottom: 16px;
+                    left: 16px;
+                    right: 16px;
+                    button{
+                      background:  rgb(26,26,26);
+                      border-radius: 50%;
+                      margin-right: 10px;
+                      border: none;
+                      width: 40px;
+                      height: 40px;
+                      svg {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                      }
+                    }
+                }
+            }
+        }
+    }
+
+}

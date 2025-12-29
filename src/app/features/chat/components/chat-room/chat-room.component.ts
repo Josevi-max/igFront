@@ -26,27 +26,40 @@ import { UiStoreService } from '../../../../core/state/ui/store/ui-store.service
 export class ChatRoomComponent implements OnDestroy {
 
   public textMessage: string = '';
-  public loading: Signal<boolean> = signal(false);
-  public messages: Signal<Message[]> = signal([]);
-  public isTyping: Signal<boolean> = signal(false);
-  public dataFriend: Signal<ApiResponseDto<UserApiDto> | undefined> = signal(undefined);
-  public usersInRoom: Signal<number> = signal(1);
-  public showTypingGif: Signal<boolean> = signal(false);
-  public showEmoyiPicker: WritableSignal<boolean> = signal(false);
   public MessageStatus = MessageStatus;
+
   private readonly chatFacadeService = inject(ChatFacadeService);
   private readonly chatmanagementService = inject(ChatStoreService);
   private readonly uiStoreService = inject(UiStoreService);
   private typingTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly TYPING_INACTIVITY_MS = 2000;
 
-  constructor() {
-    this.isTyping = this.chatmanagementService.getIsTyping();
-    this.dataFriend = this.chatmanagementService.getDataFriend();
-    this.messages = this.chatmanagementService.getMessages();
-    this.showTypingGif = this.chatmanagementService.getShowTypingGif();
-    this.usersInRoom = this.chatmanagementService.getUsersInRoom();
-    this.loading = this.uiStoreService.getIsLoading();
+  public get isLoading(): Signal<boolean> {
+    return this.uiStoreService.getIsLoading();
+  }
+
+  public get isTyping(): Signal<boolean> {
+    return this.chatmanagementService.getIsTyping();
+  }
+
+  public get dataFriend(): Signal<ApiResponseDto<UserApiDto> | undefined> {
+    return this.chatmanagementService.getDataFriend();
+  }
+
+  public get messages(): Signal<Message[]> {
+    return this.chatmanagementService.getMessages();
+  }
+
+  public get showTypingGif(): Signal<boolean> {
+    return this.chatmanagementService.getShowTypingGif();
+  }
+
+  public get usersInRoom(): Signal<number> {
+    return this.chatmanagementService.getUsersInRoom();
+  }
+
+  public get showEmoyiPicker(): Signal<boolean> {
+    return this.uiStoreService.getShowEmoyiPicker();
   }
 
   ngOnDestroy(): void {
@@ -83,10 +96,10 @@ export class ChatRoomComponent implements OnDestroy {
   }
 
   hideAllEmoyiPickers() {
-    this.showEmoyiPicker.set(false);
+    this.uiStoreService.setShowEmoyiPicker(false);
   }
 
   showHideEmoyi() {
-    this.showEmoyiPicker.set(!this.showEmoyiPicker());
+    this.uiStoreService.setShowEmoyiPicker(!this.showEmoyiPicker());
   }
 }

@@ -12,6 +12,9 @@ export const errorInterceptiorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (req.headers?.has('X-Exception')) {
+        return throwError(() => error);
+      }
 
       if (req.url.includes('auth/login')) {
         return throwError(() => error);

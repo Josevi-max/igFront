@@ -1,8 +1,8 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommentaryService } from '../../services/commment/commentary.service';
+import { HomeService } from '../../services/home/home.service';
 import { Comment } from '../../models/comments/comment';
 import { CommonModule } from '@angular/common';
-import { PublicationsService } from '../../../publications/domain/services/publications.service';
 
 @Component({
   selector: 'app-comment-box',
@@ -14,14 +14,7 @@ export class CommentBoxComponent {
   @Input() dataComment?: Comment;
   @Input() idModal: number = -1;
   @Input() isAReply: boolean = false;
-
-    private readonly publicationsService = inject(PublicationsService);
-  
-  constructor(public commentaryService: CommentaryService) { }
-
-  public calculateNumberOfDaysFromPublication(dateString: string): number {
-    return this.publicationsService.calculateNumberDaysFromPublication(dateString);
-  }
+  constructor(public commentaryService: CommentaryService, public homeService: HomeService) { }
 
   addIdToReply(dataComment: Comment, idPublication: number): void {
     if(dataComment.reply_to_id != null) {

@@ -1,11 +1,11 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, Input, input, OnChanges, OnInit, signal, SimpleChanges, WritableSignal } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from '@angular/core';
 import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
+import { HomeService } from '../../services/home/home.service';
 import { CommentaryService } from '../../services/commment/commentary.service';
 import { FormsModule } from '@angular/forms';
 import { Comment } from '../../models/comments/comment';
 import { take } from 'rxjs';
 import { AuthManagementService } from '../../../../core/state/auth/store/auth-management.service';
-import { PublicationsStoreService } from '../../../publications/state/store/publications-store.service';
 
 @Component({
   selector: 'app-add-comment-input',
@@ -14,15 +14,11 @@ import { PublicationsStoreService } from '../../../publications/state/store/publ
   styleUrl: './add-comment-input.component.less',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AddCommentInputComponent implements OnChanges {
-  private readonly publicationsStoreService = inject(PublicationsStoreService);
-  constructor(private commentaryService: CommentaryService, public authManagementService: AuthManagementService) { }
+export class AddCommentInputComponent {
+  constructor(private homeService: HomeService, private commentaryService: CommentaryService, public authManagementService: AuthManagementService) { }
   @Input() cardData: any;
   @Input() isModalSection: boolean = false;
   @Input() isReply: boolean = false;
-  ngOnChanges(changes: SimpleChanges) {
-    console.log(changes);
-  }
   addEmoji(idComment: number, event: any) {
     let textarea = document.getElementById(`commentModal${idComment}`) as HTMLInputElement;
 
@@ -90,19 +86,18 @@ export class AddCommentInputComponent implements OnChanges {
     }
   }
   updateDataSignal(idPublication: number, dataCommentary: Comment) {
-    //this.publicationsStoreService.updatePublication(idPublication);
-    // this.homeService.data.update((dataPublication: any[]) => {
-    //   const publication = dataPublication.find(p => p.id === idPublication);
+    this.homeService.data.update((dataPublication: any[]) => {
+      const publication = dataPublication.find(p => p.id === idPublication);
 
-    //   if (publication) {
-    //     publication.comments.push(dataCommentary);
-    //     this.commentaryService.listOfComments.update((data: any) => {
-    //       return [...data, dataCommentary];
-    //     });
-    //   }
+      if (publication) {
+        publication.comments.push(dataCommentary);
+        this.commentaryService.listOfComments.update((data: any) => {
+          return [...data, dataCommentary];
+        });
+      }
 
-    //   return dataPublication;
-    // });
+      return dataPublication;
+    });
   }
 
   resizeTextArea(event: Event) {

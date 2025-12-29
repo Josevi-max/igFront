@@ -1,11 +1,10 @@
-import { AfterViewInit, Component, inject, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { AddCommentInputComponent } from '../add-comment-input/add-comment-input.component';
+import { HomeService } from '../../services/home/home.service';
 import { CommentaryService } from '../../services/commment/commentary.service';
 import { Comment } from '../../models/comments/comment';
 import { CommentBoxComponent } from '../comment-box/comment-box.component';
 import { SpinnerComponent } from '../../../../shared/spinner/spinner.component';
-import { PublicationsService } from '../../../publications/domain/services/publications.service';
-import { PublicationsFacadeService } from '../../../publications/state/facade/publications-facade.service';
 
 @Component({
   selector: 'app-comment-sections',
@@ -15,9 +14,8 @@ import { PublicationsFacadeService } from '../../../publications/state/facade/pu
 })
 export class CommentSectionsComponent implements OnInit, AfterViewInit {
   @Input() dataModal: any;
-  private readonly publicationsService = inject(PublicationsService);
-  private readonly publicationsFacadeService = inject(PublicationsFacadeService);
-  constructor(public commentaryService: CommentaryService) { }
+
+  constructor(public homeService: HomeService, public commentaryService: CommentaryService) { }
   ngOnInit(): void {
     function resizeModal(): void {
       const modals = document.querySelectorAll<HTMLElement>('.modal-dialog');
@@ -47,18 +45,6 @@ export class CommentSectionsComponent implements OnInit, AfterViewInit {
         this.commentaryService.cleanListOfComments();
       });
     }
-  }
-
-  public calculateNumberOfDaysFromPublication(dateString: string): number {
-    return this.publicationsService.calculateNumberDaysFromPublication(dateString);
-  }
-
-  public addLikePublication(publicationId: number): void {
-    this.publicationsFacadeService.addLikePublication(publicationId);
-  }
-
-  public removeLikePublication(publicationId: number): void {
-    this.publicationsFacadeService.removeLikePublication(publicationId);
   }
 
   addIdToReply(dataComment: Comment, idPublication: number): void {

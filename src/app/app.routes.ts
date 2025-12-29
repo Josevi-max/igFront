@@ -1,12 +1,16 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/infrastructure/guards/auth/auth.guard';
 import { HomeComponent } from './features/home/components/home/home.component';
-import { NotFoundComponent } from './features/errors/components/not-found/not-found.component';
+import { NotFoundComponent } from './shared/not-found/not-found.component';
+import { homeResolver } from './features/home/resolvers/home.resolver';
 
 export const routes: Routes = [
     {
         path: '',
         component: HomeComponent,
+        resolve: {
+            homeData: homeResolver
+        },
         canActivate: [AuthGuard]
     },
     {

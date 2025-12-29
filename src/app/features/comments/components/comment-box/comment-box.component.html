@@ -30,7 +30,7 @@
         </div>
     </div>
     <div class="commentFooter">
-        <span class="time">{{calculateNumberOfDaysFromPublication(dataComment.created_at)}}</span>
+        <span class="time">{{this.homeService.getNumberDays(dataComment.created_at)}}</span>
         @if(dataComment.likes.length > 0){
             <span class="likesCount ">{{dataComment.likes.length}} Me gusta</span>
         }
